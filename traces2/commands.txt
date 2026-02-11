@@ -1,0 +1,61 @@
+1st column -> Thread ID, Pin thread number
+2nd column -> Effective Address, Address of instruction doing memory access
+3rd column -> Actual memory address accessed
+4th column -> Number of memory operations
+5th column -> Access size in bytes, size of memory access
+
+
+Step 1:- Trace extraction -> C program run under Intel PIN tool to obtain raw trace logs.
+Step 2:- trace processing -> extractin only the EA (3rd) column , filter unwanted regions and normalize addresses (both optional), seperate per thread to obtain EA sequence per thread
+Step 3:- Feature extraction -> 
+    a) Delta computation
+    b) Statistical features: mean delta, variance, % of constant deltas, entropy, sign distribution, zero-delta frequency, stride histogram.
+Step 4:- Interpretable Modelling layer -> instead of blackbox models use 
+    a) Decision trees
+    b) rule-based learners: RIPPER, Decision Rule lists, Bayesian Rule lists
+    c) Sparse linear models
+Step 5:- From trained interpretable models 
+    a)Decision trees:- extract decision paths and convert to rule set
+    b)Rule lists:- already in rule From
+    c)Linear:- derieve threshold boundaries.
+Step 6:- Framework output -> instead of just 
+    pattern = sequential the output can be 
+    Pattern: Sequential
+
+    Decision Explanation:
+    - 97% deltas constant
+    - Delta variance = 0.0
+    - Entropy = 0.03
+    - Mean delta = 4
+
+    Rule Triggered:
+    IF variance < 0.01 AND entropy < 0.1 → Sequential
+
+
+1. Program Execution Layer
+   - C program
+   - Intel PIN instrumentation
+
+2. Trace Processing Layer
+   - Extract EA stream
+   - Delta computation
+
+3. Feature Engineering Layer
+   - Delta statistics
+   - Entropy
+   - Variance
+   - Stride consistency
+   - Reuse metrics
+
+4. Interpretable Learning Layer
+   - Decision Tree / Rule List / Sparse Linear
+
+5. Rule Extraction Layer
+   - Convert model to human-readable rules
+
+6. Explainable Output Layer
+   - Pattern classification
+   - Justification
+   - Feature summary
+
+Optional advanced extension-> compare the learned rules v/s therotical definitions of patterns
