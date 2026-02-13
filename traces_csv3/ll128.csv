@@ -1,0 +1,2 @@
+mean_delta,std_delta,mean_abs_delta,std_abs_delta,max_abs_delta,forward_ratio,backward_ratio,zero_ratio,unique_cache_lines,mean_cl_delta,std_cl_delta,unique_pages,read_ratio,write_ratio,unique_ip_count
+1805436.032,2959788243898.931,187455705970.72,2953834184056.5376,46751538343712.0,0.502,0.498,0.0,65,-1463885133.5691383,32701351063.29687,4,0.0,0.0,6
