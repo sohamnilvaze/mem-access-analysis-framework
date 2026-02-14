@@ -16,7 +16,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-WINDOW_SIZE = 500
+WINDOW_SIZE = 5
 
 def extract_window_features(file_name):
     df = pd.read_csv(f"/home/soham/pin/mem_access_analysis_framework/traces_csv2/{file_name}.csv")
