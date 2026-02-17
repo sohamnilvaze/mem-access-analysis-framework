@@ -19,7 +19,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 1
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"ba_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")
@@ -28,7 +28,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 2
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"seq_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")   
@@ -37,7 +37,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 3
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"std_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")
@@ -46,7 +46,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 4
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"mc_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")
@@ -55,7 +55,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 5
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"mr_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")
@@ -64,7 +64,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 6
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"ia_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")   
@@ -89,7 +89,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 7
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"ra_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")   
@@ -106,7 +106,7 @@ def add_target_col():
         df = pd.read_csv(dfs)
         if "Target" not in df.columns:
             df["Target"] = 8
-            df["Fine_grained_Target"] = i
+            df["Fine_grained_Target"] = f"ll_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")
