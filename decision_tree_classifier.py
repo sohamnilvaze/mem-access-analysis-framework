@@ -26,9 +26,9 @@ X_train, X_test, y_coarse_train, y_coarse_test = train_test_split(
 )
 
 # Scaling
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+# scaler = StandardScaler()
+# X_train = scaler.fit_transform(X_train)
+# X_test = scaler.transform(X_test)
 
 
 dt = DecisionTreeClassifier(random_state=42)

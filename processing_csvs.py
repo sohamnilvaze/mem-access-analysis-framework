@@ -17,7 +17,7 @@ def add_target_col():
     i = 1
     for dfs in ["traces_csv3/ba1.csv","traces_csv3/ba2.csv","traces_csv3/ba4.csv","traces_csv3/ba8.csv","traces_csv3/ba16.csv","traces_csv3/ba32.csv","traces_csv3/ba64.csv","traces_csv3/ba128.csv"] : #8
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 1
             df["Fine_grained_Target"] = f"ba_{i}"
             i = i + 1
@@ -26,7 +26,7 @@ def add_target_col():
     i = 1
     for dfs in ["traces_csv3/seqif400.csv","traces_csv3/seqib400.csv","traces_csv3/seqdf400.csv","traces_csv3/seqdb400.csv","traces_csv3/seqif200.csv","traces_csv3/seqib200.csv","traces_csv3/seqdf200.csv","traces_csv3/seqdb200.csv","traces_csv3/seqif100.csv","traces_csv3/seqib100.csv","traces_csv3/seqdf100.csv","traces_csv3/seqdb100.csv"] : #12
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 2
             df["Fine_grained_Target"] = f"seq_{i}"
             i = i + 1
@@ -35,7 +35,7 @@ def add_target_col():
     i = 1
     for dfs in ["traces_csv3/std1.csv","traces_csv3/std2.csv","traces_csv3/std4.csv","traces_csv3/std8.csv","traces_csv3/std16.csv","traces_csv3/std32.csv","traces_csv3/std64.csv","traces_csv3/std128.csv"] : #8
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 3
             df["Fine_grained_Target"] = f"std_{i}"
             i = i + 1
@@ -44,7 +44,7 @@ def add_target_col():
     i = 1
     for dfs in ["traces_csv3/mc_1_100.csv","traces_csv3/mc_10_90.csv","traces_csv3/mc_20_80.csv","traces_csv3/mc_30_70.csv","traces_csv3/mc_40_60.csv","traces_csv3/mc_50_50.csv","traces_csv3/mc_60_40.csv","traces_csv3/mc_70_30.csv","traces_csv3/mc_80_20.csv","traces_csv3/mc_90_10.csv","traces_csv3/mc_100_1.csv"] : #11
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 4
             df["Fine_grained_Target"] = f"mc_{i}"
             i = i + 1
@@ -53,16 +53,16 @@ def add_target_col():
     i = 1
     for dfs in ["traces_csv3/mr_1_100.csv","traces_csv3/mr_10_90.csv","traces_csv3/mr_20_80.csv","traces_csv3/mr_30_70.csv","traces_csv3/mr_40_60.csv","traces_csv3/mr_50_50.csv","traces_csv3/mr_60_40.csv","traces_csv3/mr_70_30.csv","traces_csv3/mr_80_20.csv","traces_csv3/mr_90_10.csv","traces_csv3/mr_100_1.csv"] : #11
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 5
             df["Fine_grained_Target"] = f"mr_{i}"
             i = i + 1
             df.to_csv(dfs,index=False)
             print(f"Added for {dfs}")
     i = 1
-    for dfs in ["traces_csv3/i3.csv","traces_csv3/i10.csv","traces_csv3/i50.csv","traces_csv3/i100.csv","traces_csv3/i250.csv","traces_csv3/i500.csv","traces_csv3/i750.csv","traces_csv3/i1024.csv"]: #8
+    for dfs in ["traces_csv3/ia3.csv","traces_csv3/i10.csv","traces_csv3/i50.csv","traces_csv3/i100.csv","traces_csv3/i250.csv","traces_csv3/i500.csv","traces_csv3/i750.csv","traces_csv3/i1024.csv"]: #8
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 6
             df["Fine_grained_Target"] = f"ia_{i}"
             i = i + 1
@@ -87,7 +87,7 @@ def add_target_col():
     i = 1
     for dfs in ["traces_csv3/ra10.csv","traces_csv3/ra50.csv","traces_csv3/ra100.csv","traces_csv3/ra250.csv","traces_csv3/ra500.csv","traces_csv3/ra750.csv","traces_csv3/ra1000.csv"]: #7
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 7
             df["Fine_grained_Target"] = f"ra_{i}"
             i = i + 1
@@ -104,7 +104,7 @@ def add_target_col():
     i = 1
     for dfs in ["traces_csv3/ll2.csv","traces_csv3/ll4.csv","traces_csv3/ll8.csv","traces_csv3/ll16.csv","traces_csv3/ll32.csv","traces_csv3/ll64.csv","traces_csv3/ll128.csv","traces_csv3/ll256.csv","traces_csv3/ll512.csv","traces_csv3/ll1024.csv"]: #10
         df = pd.read_csv(dfs)
-        if "Target" not in df.columns:
+        if df.shape[0] > 0 and "Target" not in df.columns:
             df["Target"] = 8
             df["Fine_grained_Target"] = f"ll_{i}"
             i = i + 1
@@ -164,7 +164,7 @@ def merge_dfs():
     stdmerged_df.to_csv("traces_csv4/std_merged.csv",index=False)
 
     #6
-    df29 = pd.read_csv("traces_csv3/i3.csv")
+    df29 = pd.read_csv("traces_csv3/ia3.csv")
     df30 = pd.read_csv("traces_csv3/i10.csv")
     df31 = pd.read_csv("traces_csv3/i50.csv")
     df32 = pd.read_csv("traces_csv3/i100.csv")
