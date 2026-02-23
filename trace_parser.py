@@ -24,7 +24,7 @@ def parse_trace(file_path,output_path):
 from pathlib import Path
 
 # Replace '.' with your folder path
-folder = Path('/home/soham/pin/mem_access_analysis_framework/traces2')
+folder = Path('/home/soham/pin/mem_access_analysis_framework/traces2_extended')
 
 # Recursively find all files
 file_paths = [str(p.absolute()) for p in folder.rglob('*') if p.is_file()]

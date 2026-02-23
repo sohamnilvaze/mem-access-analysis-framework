@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix, classification_report
 
 
 df = pd.read_csv("traces_csv4/merged.csv")
@@ -71,9 +71,12 @@ roc_auc_weighted_ovr = roc_auc_score(y_coarse_test,y_proba,average="weighted",mu
 print(f"ROC-AUC macro-ovr:- {roc_auc_macro_ovr}")
 # print(f"ROC-AUC weighted-ovo:- {roc_auc_weighted_ovo}")
 print(f"ROC-AUC weighted-ovr:- {roc_auc_weighted_ovr}")
+print(f"Classification report:- {classification_report(y_coarse_test,y_pred)}")
 
 importance = pd.Series(best_dt.feature_importances_, index=X.columns)
 print(importance.sort_values(ascending=False))
+
+print(df['Target'].value_counts(normalize=True))
 
 
 cm = confusion_matrix(y_coarse_test,y_pred)

@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix,classification_report
 
 
 df = pd.read_csv("traces_csv4/merged.csv")
@@ -42,9 +42,9 @@ rf = RandomForestClassifier(random_state=42)
 
 param_grid_rf = {
     'n_estimators': [300],
-    'max_depth': [None],
-    'min_samples_split': [2],
-    'min_samples_leaf': [1],
+    'max_depth': [10],
+    'min_samples_split': [5],
+    'min_samples_leaf': [2],
     'max_features': ['sqrt']
 }
 
@@ -80,6 +80,8 @@ roc_auc_weighted_ovr = roc_auc_score(y_coarse_test,y_proba,average="weighted",mu
 print(f"ROC-AUC macro-ovr:- {roc_auc_macro_ovr}")
 # print(f"ROC-AUC weighted-ovo:- {roc_auc_weighted_ovo}")
 print(f"ROC-AUC weighted-ovr:- {roc_auc_weighted_ovr}")
+print(f"Classification report:- {classification_report(y_coarse_test,y_pred)}")
+
 
 # {'max_depth': None, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}
 
