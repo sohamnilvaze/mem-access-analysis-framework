@@ -26,34 +26,34 @@ X_train, X_test, y_coarse_train, y_coarse_test = train_test_split(
 )
 
 # Scaling
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+# scaler = StandardScaler()
+# X_train = scaler.fit_transform(X_train)
+# X_test = scaler.transform(X_test)
 
 
 rf = RandomForestClassifier(random_state=42)
-# param_grid_rf = {
-#     'n_estimators': [100, 200, 300],
-#     'max_depth': [None, 10, 20, 30],
-#     'min_samples_split': [2, 5, 10],
-#     'min_samples_leaf': [1, 2, 5],
-#     'max_features': ['sqrt', 'log2']
-# }
-
 param_grid_rf = {
-    'n_estimators': [300],
-    'max_depth': [10],
-    'min_samples_split': [5],
-    'min_samples_leaf': [2],
-    'max_features': ['sqrt']
+    'n_estimators': [100, 200, 400],
+    'max_depth': [5, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 5],
+    'max_features': ['sqrt', 'log2']
 }
+
+# param_grid_rf = {
+#     'n_estimators': [300],
+#     'max_depth': [10],
+#     'min_samples_split': [5],
+#     'min_samples_leaf': [2],
+#     'max_features': ['sqrt']
+# }
 
 
 grid_dt = GridSearchCV(
     rf,
     param_grid_rf,
     cv=3,
-    scoring='balanced_accuracy',
+    scoring='f1_macro',
     n_jobs=-1,
     verbose=2
 )

@@ -34,7 +34,7 @@ X_train, X_test, y_coarse_train, y_coarse_test = train_test_split(
 dt = DecisionTreeClassifier(random_state=42)
 param_grid_dt = {
     'criterion': ['gini', 'entropy'],
-    'max_depth': [None, 5, 10, 15, 20],
+    'max_depth': [5, 10, 15, 20],
     'min_samples_split': [2, 5, 10, 20],
     'min_samples_leaf': [1, 2, 5, 10],
     'max_features': [None, 'sqrt', 'log2']
@@ -44,7 +44,7 @@ grid_dt = GridSearchCV(
     dt,
     param_grid_dt,
     cv=3,
-    scoring='balanced_accuracy',
+    scoring='f1_macro',
     n_jobs=-1,
     verbose=2
 )
@@ -108,5 +108,64 @@ zero_ratio            0.000000
 read_ratio            0.000000
 write_ratio           0.000000
 '''
+'''
+Best params: {'criterion': 'entropy', 'max_depth': 15, 'max_features': None, 'min_samples_leaf': 1, 'min_samples_split': 2}
+Best CV score: 0.7358952116923364
+Accuracy:- 0.7806813172973994
+F1 score macro:- 0.7350676606608086
+F1 score weighted:- 0.7540471151750853
+ROC-AUC macro-ovr:- 0.8846335683400941
+ROC-AUC weighted-ovr:- 0.8588522709091659
+Classification report:-               precision    recall  f1-score   support
 
+           1       1.00      0.75      0.86      5242
+           2       0.97      0.60      0.74       193
+           3       0.65      1.00      0.79      6547
+           4       0.98      0.50      0.67      1327
+           5       0.85      0.05      0.10      1327
+           6       0.99      0.75      0.85       440
+           7       1.00      0.77      0.87       318
+           8       1.00      1.00      1.00       487
+
+    accuracy                           0.78     15881
+   macro avg       0.93      0.68      0.74     15881
+weighted avg       0.84      0.78      0.75     15881
+
+max_consecutive_same_delta     0.437298
+abs_dominant_stride            0.236825
+stride_change_rate             0.077689
+dominant_stride_ratio          0.055965
+backward_ratio                 0.044793
+unique_ip_count                0.040499
+mean_abs_delta                 0.034667
+mean_delta                     0.028052
+unique_cache_lines             0.013486
+delta_entropy                  0.007733
+forward_ratio                  0.007258
+std_abs_delta                  0.004586
+max_abs_delta                  0.002760
+mean_cl_delta                  0.002271
+std_cl_delta                   0.001729
+avg_accesses_per_cache_line    0.001383
+cl_small_jump_ratio            0.000767
+std_delta                      0.000757
+cache_line_reuse_ratio         0.000709
+page_reuse_ratio               0.000443
+unique_pages                   0.000167
+mean_stride_to_cl_ratio        0.000161
+zero_ratio                     0.000000
+read_ratio                     0.000000
+write_ratio                    0.000000
+dtype: float64
+Target
+3    0.412246
+1    0.330059
+4    0.083560
+5    0.083560
+8    0.030666
+6    0.027706
+7    0.020012
+2    0.012191
+Name: proportion, dtype: float64
+'''
 
