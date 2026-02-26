@@ -4,6 +4,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix,classification_report
 
@@ -32,21 +33,21 @@ X_train, X_test, y_coarse_train, y_coarse_test = train_test_split(
 
 
 rf = RandomForestClassifier(random_state=42)
-param_grid_rf = {
-    'n_estimators': [100, 200, 400],
-    'max_depth': [5, 10, 20, 30],
-    'min_samples_split': [2, 5, 10],
-    'min_samples_leaf': [1, 2, 5],
-    'max_features': ['sqrt', 'log2']
-}
-
 # param_grid_rf = {
-#     'n_estimators': [300],
-#     'max_depth': [10],
-#     'min_samples_split': [5],
-#     'min_samples_leaf': [2],
-#     'max_features': ['sqrt']
+#     'n_estimators': [100, 200, 400],
+#     'max_depth': [5, 10, 20, 30],
+#     'min_samples_split': [2, 5, 10],
+#     'min_samples_leaf': [1, 2, 5],
+#     'max_features': ['sqrt', 'log2']
 # }
+
+param_grid_rf = {
+    'n_estimators': [400],
+    'max_depth': [20],
+    'min_samples_split': [2],
+    'min_samples_leaf': [1],
+    'max_features': ['sqrt']
+}
 
 
 grid_dt = GridSearchCV(
@@ -63,8 +64,8 @@ print("Best params:", grid_dt.best_params_)
 print("Best CV score:", grid_dt.best_score_)
 
 best_dt = grid_dt.best_estimator_
-y_pred = grid_dt.predict(X_test)
-y_proba = grid_dt.predict_proba(X_test)
+y_pred = best_dt.predict(X_test)
+y_proba = best_dt.predict_proba(X_test)
 acc = accuracy_score(y_coarse_test,y_pred)
 print(f"Accuracy:- {acc}")
 f1m = f1_score(y_coarse_test,y_pred,average="macro")
@@ -94,6 +95,32 @@ cm = confusion_matrix(y_coarse_test,y_pred)
 plt.figure(figsize=(8,6))
 sns.heatmap(cm,annot=True,fmt="d")
 plt.show()
+
+print("---- Starting for Surrogate model")
+best_max_depth = grid_dt.best_params_["max_depth"]
+surrogate = DecisionTreeClassifier(max_depth = best_max_depth)
+y_pred_train = best_dt.predict(X_train)
+surrogate.fit(X_train,y_pred_train)
+
+y_pred2 = surrogate.predict(X_test)
+y_proba2 = surrogate.predict_proba(X_test)
+acc = accuracy_score(y_coarse_test,y_pred2)
+print(f"Accuracy:- {acc}")
+f1m = f1_score(y_coarse_test,y_pred2,average="macro")
+print(f"F1 score macro:- {f1m}")
+f1w = f1_score(y_coarse_test,y_pred2,average="weighted")
+print(f"F1 score weighted:- {f1w}")
+# roc_auc_macro_ovo = roc_auc_score(y_coarse_test,y_pred,average="macro",multi_class="ovo")
+roc_auc_macro_ovr = roc_auc_score(y_coarse_test,y_proba2,average="macro",multi_class="ovr")
+# roc_auc_weighted_ovo = roc_auc_score(y_coarse_test,y_pred,average="weighted",multi_class="ovo")
+roc_auc_weighted_ovr = roc_auc_score(y_coarse_test,y_proba2,average="weighted",multi_class="ovr")
+
+# print(f"ROC-AUC macro-ovo:- {roc_auc_macro_ovo}")
+print(f"ROC-AUC macro-ovr:- {roc_auc_macro_ovr}")
+# print(f"ROC-AUC weighted-ovo:- {roc_auc_weighted_ovo}")
+print(f"ROC-AUC weighted-ovr:- {roc_auc_weighted_ovr}")
+print(f"Classification report:- {classification_report(y_coarse_test,y_pred2)}")
+
 
 
 '''

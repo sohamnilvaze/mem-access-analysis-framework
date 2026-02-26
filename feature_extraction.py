@@ -45,7 +45,7 @@ from scipy.stats import entropy
 # Sliding Window Configuration
 # =============================
 WINDOW_SIZE = 100
-STEP_SIZE = 25   # 50% overlap
+STEP_SIZE = 50  # 50% overlap
 
 def compute_entropy(series):
     counts = series.value_counts()
@@ -121,7 +121,7 @@ def extract_window_features(file_name):
         # =============================
         feature['forward_ratio'] = (window['direction'] == 1).mean()
         feature['backward_ratio'] = (window['direction'] == -1).mean()
-        feature['zero_ratio'] = (window['direction'] == 0).mean()
+        #feature['zero_ratio'] = (window['direction'] == 0).mean()
 
         # =============================
         # CACHE FEATURES
@@ -157,7 +157,7 @@ def extract_window_features(file_name):
         # PAGE FEATURES
         # =============================
         unique_pages = window['page'].nunique()
-        feature['unique_pages'] = unique_pages
+        #feature['unique_pages'] = unique_pages
 
         feature['page_reuse_ratio'] = 1 - (
             unique_pages / WINDOW_SIZE
@@ -166,8 +166,8 @@ def extract_window_features(file_name):
         # =============================
         # ACCESS TYPE
         # =============================
-        feature['read_ratio'] = (window['access_type'] == 'R').mean()
-        feature['write_ratio'] = (window['access_type'] == 'W').mean()
+        #feature['read_ratio'] = (window['access_type'] == 'R').mean()
+        #feature['write_ratio'] = (window['access_type'] == 'W').mean()
 
         # =============================
         # INSTRUCTION DIVERSITY

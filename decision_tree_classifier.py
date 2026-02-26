@@ -3,10 +3,35 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, _tree, export_text
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix, classification_report
 
+
+def explain_prediction(model, feature_names, sample):
+    tree = model.tree_
+    feature = tree.feature
+    threshold = tree.threshold
+    
+    node_indicator = model.decision_path(sample)
+    leaf_id = model.apply(sample)
+
+    explanation = []
+
+    for node_id in node_indicator.indices:
+        if leaf_id[0] == node_id:
+            continue
+            
+        if sample[0, feature[node_id]] <= threshold[node_id]:
+            threshold_sign = "<="
+        else:
+            threshold_sign = ">"
+            
+        explanation.append(
+            f"{feature_names[feature[node_id]]} {threshold_sign} {threshold[node_id]:.3f}"
+        )
+
+    return explanation
 
 df = pd.read_csv("traces_csv4/merged.csv")
 
@@ -54,8 +79,8 @@ print("Best params:", grid_dt.best_params_)
 print("Best CV score:", grid_dt.best_score_)
 
 best_dt = grid_dt.best_estimator_
-y_pred = grid_dt.predict(X_test)
-y_proba = grid_dt.predict_proba(X_test)
+y_pred = best_dt.predict(X_test)
+y_proba = best_dt.predict_proba(X_test)
 acc = accuracy_score(y_coarse_test,y_pred)
 print(f"Accuracy:- {acc}")
 f1m = f1_score(y_coarse_test,y_pred,average="macro")
@@ -78,6 +103,9 @@ print(importance.sort_values(ascending=False))
 
 print(df['Target'].value_counts(normalize=True))
 
+rules = export_text(best_dt, feature_names=list(X.columns))
+with open("rules/decision_tree_classifier.txt","w") as f:
+    f.write(rules)
 
 cm = confusion_matrix(y_coarse_test,y_pred)
 plt.figure(figsize=(8,6))
