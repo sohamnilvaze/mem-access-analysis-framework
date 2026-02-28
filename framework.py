@@ -186,16 +186,16 @@ class MemoryAccessModel:
         # ============================
         # Save Model
         # ============================
-        joblib.dump(self.model, "models/dt_model.pkl")
+        joblib.dump(self.model, "models/dt_model_custom.pkl")
 
         # ============================
         # Save Decision Tree Rules
         # ============================
         rules = export_text(self.model, feature_names=list(X.columns))
-        with open("rules/decision_tree_rules.txt", "w") as f:
+        with open("rules/decision_tree_rules_custom.txt", "w") as f:
             f.write(rules)
 
-        print("\nDecision tree rules saved to rules/decision_tree_rules.txt")
+        print("\nDecision tree rules saved to rules/decision_tree_rules_custom.txt")
 
         # ============================
         # Confusion Matrix Plot
@@ -204,7 +204,7 @@ class MemoryAccessModel:
         plt.figure(figsize=(8,6))
         sns.heatmap(cm, annot=True, fmt="d")
         plt.title("Confusion Matrix (Train)")
-        plt.savefig("plots/confusion_matrix_train.png")
+        plt.savefig("plots/confusion_matrix_train_custom.png")
         plt.close()
 
         # ============================
@@ -213,18 +213,18 @@ class MemoryAccessModel:
         shap_values = self.explainer.shap_values(X_test)
 
         shap.summary_plot(shap_values, X_test, show=False)
-        plt.savefig("plots/shap_summary_train.png")
+        plt.savefig("plots/shap_summary_train_custom.png")
         plt.close()
 
         shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
-        plt.savefig("plots/shap_bar_train.png")
+        plt.savefig("plots/shap_bar_train_custom.png")
         plt.close()
 
         print("SHAP plots saved to plots/")
 
         return self.model    
 
-    def load_model(self, path="models/dt_model.pkl"):
+    def load_model(self, path="models/dt_model_custom.pkl"):
         self.model = joblib.load(path)
         self.explainer = shap.TreeExplainer(self.model)
 
@@ -261,11 +261,11 @@ class MemoryAccessModel:
         shap_values = self.explainer.shap_values(feature_df)
 
         shap.summary_plot(shap_values, feature_df, show=False)
-        plt.savefig("plots/shap_summary_test.png")
+        plt.savefig("plots/shap_summary_test_custom.png")
         plt.close()
 
         shap.summary_plot(shap_values, feature_df, plot_type="bar", show=False)
-        plt.savefig("plots/shap_bar_test.png")
+        plt.savefig("plots/shap_bar_test_custom.png")
         plt.close()
 
         print("Test SHAP plots saved to plots/")

@@ -1,0 +1,67 @@
+1) for stream
+Final training dataset shape: (7293, 23)
+Best Params: {'criterion': 'entropy', 'max_depth': 20}
+
+===== TRAIN METRICS =====
+Accuracy: 0.9019876627827279
+F1 Macro: 0.8693588530795805
+F1 Weighted: 0.9013699757295995
+ROC-AUC Macro: 0.97991902843436
+ROC-AUC Weighted: 0.9869918675184091
+
+2) for custom c programs
+Final training dataset shape: (45599, 23)
+Best Params: {'criterion': 'entropy', 'max_depth': 20}
+
+===== TRAIN METRICS =====
+Accuracy: 0.7898026315789474
+F1 Macro: 0.7258533163065759
+F1 Weighted: 0.7682830320909669
+ROC-AUC Macro: 0.9066543717986651
+ROC-AUC Weighted: 0.8973783477557995
+
+3) Polybench 
+
+PolybenchC kernels to be preferred:-
+
+| Kernel      | Pattern Category      |
+| ----------- | --------------------- |
+| gemm        | Dense block reuse     |
+| 2mm         | Multi-phase dense     |
+| atax        | Streaming dense       |
+| jacobi-2d   | Simple stencil        |
+| mvt         | Mixed row/column      |
+| syr2k       | Partial dense update  |
+| fdtd-2d     | Multi-array stencil   |
+| correlation | Column-wise reduction |
+
+gcc gemm.c utilities/polybench.c -DMINI_DATASET -O0 -g -o gemm
+
+
+Final training dataset shape: (13609, 23)
+Best Params: {'criterion': 'entropy', 'max_depth': 20}
+
+===== TRAIN METRICS =====
+Accuracy: 0.9915503306392358
+F1 Macro: 0.9845283986957492
+F1 Weighted: 0.9915331367288525
+ROC-AUC Macro: 0.9982369323709848
+ROC-AUC Weighted: 0.9993464319673351
+
+
+1️⃣ Modified STREAM (Streaming bandwidth)
+2️⃣ PolyBench GEMM (Dense compute)
+3️⃣ Jacobi 2D (Stencil)
+4️⃣ CSR SpMV (Sparse)
+5️⃣ BFS (Graph traversal)
+
+That gives:
+
+Benchmark	Behavior
+STREAM	Linear streaming
+GEMM	Blocked reuse
+Jacobi	Structured stencil
+SpMV	Indirect sparse
+BFS	Pointer chasing
+
+

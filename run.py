@@ -49,15 +49,31 @@ def train_from_traces():
             label = 2
         elif file.startswith("std"):
             label = 3
-        elif file.startswith("mc"):
-            label = 4
-        elif file.startswith("mr"):
-            label = 5
         elif file.startswith("i"):
-            label = 6
+            label = 4
         elif file.startswith("ra"):
-            label = 7
+            label = 5
         elif file.startswith("ll"):
+            label = 6
+        elif file.startswith("mc"):
+            label = 7
+        elif file.startswith("mr"):
+            label = 8
+        elif file.startswith("2mm"):
+            label = 1
+        elif file.startswith("atax"):
+            label = 2
+        elif file.startswith("corr"):
+            label = 3
+        elif file.startswith("fdtd"):
+            label = 4
+        elif file.startswith("gemm"):
+            label = 5
+        elif file.startswith("jacobi"):
+            label = 6
+        elif file.startswith("mvt"):
+            label = 7
+        elif file.startswith("syr2k"):
             label = 8
         else:
             print("Unknown label pattern. Skipping.")
