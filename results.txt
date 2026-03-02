@@ -1,4 +1,4 @@
-1) for stream
+1) for stream -> 6 classes
 Final training dataset shape: (7293, 23)
 Best Params: {'criterion': 'entropy', 'max_depth': 20}
 
@@ -9,7 +9,7 @@ F1 Weighted: 0.9013699757295995
 ROC-AUC Macro: 0.97991902843436
 ROC-AUC Weighted: 0.9869918675184091
 
-2) for custom c programs
+2) for custom c programs -> 8 classes
 Final training dataset shape: (45599, 23)
 Best Params: {'criterion': 'entropy', 'max_depth': 20}
 
@@ -20,7 +20,7 @@ F1 Weighted: 0.7682830320909669
 ROC-AUC Macro: 0.9066543717986651
 ROC-AUC Weighted: 0.8973783477557995
 
-3) Polybench 
+3) Polybench -> 8 classes
 
 PolybenchC kernels to be preferred:-
 
@@ -48,20 +48,55 @@ F1 Weighted: 0.9915331367288525
 ROC-AUC Macro: 0.9982369323709848
 ROC-AUC Weighted: 0.9993464319673351
 
-
-1️⃣ Modified STREAM (Streaming bandwidth)
-2️⃣ PolyBench GEMM (Dense compute)
-3️⃣ Jacobi 2D (Stencil)
-4️⃣ CSR SpMV (Sparse)
-5️⃣ BFS (Graph traversal)
-
 That gives:
 
-Benchmark	Behavior
-STREAM	Linear streaming
-GEMM	Blocked reuse
-Jacobi	Structured stencil
-SpMV	Indirect sparse
-BFS	Pointer chasing
+3) Nasa parallel benchmark (NPB):- 5 classes
+
+The kernels selected:
+a) CG(Conjugate Gradient) -> Memory: Sparse, indirect access -> Very good for irregular patterns
+b) MG(Multigrid) -> Memory: Hierarchical, recursive, cache reuse
+c) FT(Fast Fourier Transform) -> Memory: Strided + large arrays
+d) EP (Embarrassingly Parallel) -> Memory: Minimal memory pressure (baseline)
+e) IS (Integer Sort) -> Memory: Random bucket accesses
+
+make cg CLASS=S
+make mg CLASS=S
+make ft CLASS=S
+make ep CLASS=S
+make is CLASS=S
+
+Final training dataset shape: (69990, 23)
+Best Params: {'criterion': 'entropy', 'max_depth': 10}
+
+===== TRAIN METRICS =====
+Accuracy: 0.9950707243891984
+F1 Macro: 0.9950715795591334
+F1 Weighted: 0.9950717461194603
+ROC-AUC Macro: 0.9994764440847466
+ROC-AUC Weighted: 0.9994764493008563
+
+4) Rodinia -> 5 classes
+
+The kernels selected:
+a) bfs -> memory patterns: pointer chasing, indirect indexing, irregular graph traversal, 
+b) hotspot(2d stencil) -> strong spatial locality, predictable strides
+c) kmeans -> streaming over large arrays, moderate locality
+d) particlefilter -> randomized access
+
+| Kernel        | Memory Pattern Type       | Why Important              |
+| ------------- | ------------------------- | -------------------------- |
+| bfs           | Irregular graph traversal | Pointer chasing            |
+| hotspot       | Regular stencil           | Spatial locality           |
+| srad          | Iterative stencil         | Repeated structured access |
+| kmeans        | Streaming + reduction     | Linear + cluster updates   |
 
 
+Final training dataset shape: (63313, 23)
+Best Params: {'criterion': 'entropy', 'max_depth': 10}
+
+===== TRAIN METRICS =====
+Accuracy: 0.9990523572613125
+F1 Macro: 0.9990510226110354
+F1 Weighted: 0.9990523677069528
+ROC-AUC Macro: 0.9994222687112891
+ROC-AUC Weighted: 0.9994273085530516

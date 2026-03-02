@@ -1,0 +1,7 @@
+max_consecutive_same_delta > 63.5000
+forward_ratio > 0.9950
+mean_delta <= 7.2800
+cache_line_reuse_ratio > 0.9250
+mean_stride_to_cl_ratio > 61.3707
+page_reuse_ratio > 0.9850
+cl_small_jump_ratio > 0.9949

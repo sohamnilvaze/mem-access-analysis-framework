@@ -1,0 +1,5 @@
+std_abs_delta <= 240838.0625
+cl_small_jump_ratio <= 0.1465
+std_cl_delta <= 818.0938
+page_reuse_ratio <= 0.9550
+cl_small_jump_ratio > 0.0101

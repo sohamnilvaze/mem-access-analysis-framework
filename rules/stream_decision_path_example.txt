@@ -1,0 +1,5 @@
+delta_entropy > 2.5462
+avg_accesses_per_cache_line <= 3.1426
+mean_abs_delta > 12178.4800
+dominant_stride_ratio <= 0.4750
+std_abs_delta <= 6451.7300

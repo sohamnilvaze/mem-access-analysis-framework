@@ -1,0 +1,3 @@
+max_consecutive_same_delta <= 63.5000
+abs_dominant_stride <= 6.0000
+unique_ip_count <= 1.5000

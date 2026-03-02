@@ -7,8 +7,9 @@ from framework import TraceProcessor, MemoryAccessModel
 # CONFIG
 # ==============================
 
-TRAINING_TRACE_FOLDER = "training_traces2"
-MODEL_SAVE_PATH = "models/dt_model.pkl"
+benchmark = "rodinia"
+TRAINING_TRACE_FOLDER = "training_traces_rodinia"
+MODEL_SAVE_PATH = f"models/{benchmark}_model.pkl"
 
 # ==============================
 # TRAINING PIPELINE
@@ -75,6 +76,26 @@ def train_from_traces():
             label = 7
         elif file.startswith("syr2k"):
             label = 8
+        elif file.startswith("cg"):
+            label = 1
+        elif file.startswith("ep"):
+            label = 2
+        elif file.startswith("ft"):
+            label = 3
+        elif file.startswith("is"):
+            label = 4
+        elif file.startswith("mg"):
+            label = 5
+        elif file.startswith("bfs"):
+            label = 1
+        elif file.startswith("hotspot"):
+            label = 2
+        elif file.startswith("kmeans"):
+            label = 3
+        elif file.startswith("particle"):
+            label = 4
+        elif file.startswith("srad"):
+            label = 5    
         else:
             print("Unknown label pattern. Skipping.")
             continue

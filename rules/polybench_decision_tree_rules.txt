@@ -1,0 +1,232 @@
+|--- max_consecutive_same_delta <= 63.50
+|   |--- abs_dominant_stride <= 6.00
+|   |   |--- unique_ip_count <= 1.50
+|   |   |   |--- class: 1
+|   |   |--- unique_ip_count >  1.50
+|   |   |   |--- delta_entropy <= 1.86
+|   |   |   |   |--- max_consecutive_same_delta <= 46.50
+|   |   |   |   |   |--- avg_accesses_per_cache_line <= 3.15
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- avg_accesses_per_cache_line >  3.15
+|   |   |   |   |   |   |--- class: 1
+|   |   |   |   |--- max_consecutive_same_delta >  46.50
+|   |   |   |   |   |--- dominant_stride_ratio <= 0.74
+|   |   |   |   |   |   |--- cl_small_jump_ratio <= 0.91
+|   |   |   |   |   |   |   |--- mean_cl_delta <= -4.50
+|   |   |   |   |   |   |   |   |--- max_abs_delta <= 23295749554174.00
+|   |   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |   |   |--- max_abs_delta >  23295749554174.00
+|   |   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |--- mean_cl_delta >  -4.50
+|   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |--- cl_small_jump_ratio >  0.91
+|   |   |   |   |   |   |   |--- std_delta <= 3457.89
+|   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |--- std_delta >  3457.89
+|   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- dominant_stride_ratio >  0.74
+|   |   |   |   |   |   |--- unique_ip_count <= 14.50
+|   |   |   |   |   |   |   |--- mean_abs_delta <= 381.60
+|   |   |   |   |   |   |   |   |--- max_abs_delta <= 2596.00
+|   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line <= 13.39
+|   |   |   |   |   |   |   |   |   |   |--- class: 2
+|   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line >  13.39
+|   |   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta <= 55.00
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta >  55.00
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |--- max_abs_delta >  2596.00
+|   |   |   |   |   |   |   |   |   |--- class: 5
+|   |   |   |   |   |   |   |--- mean_abs_delta >  381.60
+|   |   |   |   |   |   |   |   |--- std_abs_delta <= 10014842945536.00
+|   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta <= 61.50
+|   |   |   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta >  61.50
+|   |   |   |   |   |   |   |   |   |   |--- mean_cl_delta <= -10.20
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 1
+|   |   |   |   |   |   |   |   |   |   |--- mean_cl_delta >  -10.20
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |--- std_abs_delta >  10014842945536.00
+|   |   |   |   |   |   |   |   |   |--- std_abs_delta <= 11082954964992.00
+|   |   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line <= 10.42
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 2
+|   |   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line >  10.42
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 1
+|   |   |   |   |   |   |   |   |   |--- std_abs_delta >  11082954964992.00
+|   |   |   |   |   |   |   |   |   |   |--- class: 1
+|   |   |   |   |   |   |--- unique_ip_count >  14.50
+|   |   |   |   |   |   |   |--- backward_ratio <= 0.07
+|   |   |   |   |   |   |   |   |--- mean_cl_delta <= 135961.82
+|   |   |   |   |   |   |   |   |   |--- cache_line_reuse_ratio <= 0.86
+|   |   |   |   |   |   |   |   |   |   |--- std_delta <= 13063352221696.00
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 5
+|   |   |   |   |   |   |   |   |   |   |--- std_delta >  13063352221696.00
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |   |   |--- cache_line_reuse_ratio >  0.86
+|   |   |   |   |   |   |   |   |   |   |--- class: 5
+|   |   |   |   |   |   |   |   |--- mean_cl_delta >  135961.82
+|   |   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |--- backward_ratio >  0.07
+|   |   |   |   |   |   |   |   |--- class: 5
+|   |   |   |--- delta_entropy >  1.86
+|   |   |   |   |--- mean_abs_delta <= 10174431887360.00
+|   |   |   |   |   |--- class: 6
+|   |   |   |   |--- mean_abs_delta >  10174431887360.00
+|   |   |   |   |   |--- class: 7
+|   |--- abs_dominant_stride >  6.00
+|   |   |--- stride_change_rate <= 0.64
+|   |   |   |--- abs_dominant_stride <= 36.00
+|   |   |   |   |--- dominant_stride_ratio <= 0.74
+|   |   |   |   |   |--- class: 3
+|   |   |   |   |--- dominant_stride_ratio >  0.74
+|   |   |   |   |   |--- class: 2
+|   |   |   |--- abs_dominant_stride >  36.00
+|   |   |   |   |--- dominant_stride_ratio <= 0.63
+|   |   |   |   |   |--- cache_line_reuse_ratio <= 0.48
+|   |   |   |   |   |   |--- std_cl_delta <= 174933852160.00
+|   |   |   |   |   |   |   |--- std_abs_delta <= 3740.54
+|   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |--- std_abs_delta >  3740.54
+|   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |--- std_cl_delta >  174933852160.00
+|   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |--- cache_line_reuse_ratio >  0.48
+|   |   |   |   |   |   |--- class: 4
+|   |   |   |   |--- dominant_stride_ratio >  0.63
+|   |   |   |   |   |--- class: 4
+|   |   |--- stride_change_rate >  0.64
+|   |   |   |--- delta_entropy <= 3.60
+|   |   |   |   |--- class: 8
+|   |   |   |--- delta_entropy >  3.60
+|   |   |   |   |--- std_cl_delta <= 420229734400.00
+|   |   |   |   |   |--- class: 6
+|   |   |   |   |--- std_cl_delta >  420229734400.00
+|   |   |   |   |   |--- class: 7
+|--- max_consecutive_same_delta >  63.50
+|   |--- backward_ratio <= 0.00
+|   |   |--- mean_cl_delta <= 0.11
+|   |   |   |--- unique_cache_lines <= 7.50
+|   |   |   |   |--- std_cl_delta <= 0.25
+|   |   |   |   |   |--- page_reuse_ratio <= 0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- page_reuse_ratio >  0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |--- std_cl_delta >  0.25
+|   |   |   |   |   |--- page_reuse_ratio <= 0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- page_reuse_ratio >  0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |--- unique_cache_lines >  7.50
+|   |   |   |   |--- mean_abs_delta <= 5.28
+|   |   |   |   |   |--- page_reuse_ratio <= 0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- page_reuse_ratio >  0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |--- mean_abs_delta >  5.28
+|   |   |   |   |   |--- class: 1
+|   |   |--- mean_cl_delta >  0.11
+|   |   |   |--- mean_abs_delta <= 12.00
+|   |   |   |   |--- avg_accesses_per_cache_line <= 7.42
+|   |   |   |   |   |--- page_reuse_ratio <= 0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- page_reuse_ratio >  0.99
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |--- avg_accesses_per_cache_line >  7.42
+|   |   |   |   |   |--- mean_stride_to_cl_ratio <= 64.10
+|   |   |   |   |   |   |--- page_reuse_ratio <= 0.99
+|   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |--- page_reuse_ratio >  0.99
+|   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- mean_stride_to_cl_ratio >  64.10
+|   |   |   |   |   |   |--- page_reuse_ratio <= 0.99
+|   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |--- page_reuse_ratio >  0.99
+|   |   |   |   |   |   |   |--- class: 3
+|   |   |   |--- mean_abs_delta >  12.00
+|   |   |   |   |--- class: 3
+|   |--- backward_ratio >  0.00
+|   |   |--- avg_accesses_per_cache_line <= 4.08
+|   |   |   |--- std_cl_delta <= 60.51
+|   |   |   |   |--- class: 4
+|   |   |   |--- std_cl_delta >  60.51
+|   |   |   |   |--- mean_abs_delta <= 2773272821760.00
+|   |   |   |   |   |--- mean_delta <= -8922095616.00
+|   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |--- mean_delta >  -8922095616.00
+|   |   |   |   |   |   |--- class: 3
+|   |   |   |   |--- mean_abs_delta >  2773272821760.00
+|   |   |   |   |   |--- class: 4
+|   |   |--- avg_accesses_per_cache_line >  4.08
+|   |   |   |--- forward_ratio <= 0.45
+|   |   |   |   |--- class: 2
+|   |   |   |--- forward_ratio >  0.45
+|   |   |   |   |--- forward_ratio <= 0.90
+|   |   |   |   |   |--- std_abs_delta <= 8049473881162.75
+|   |   |   |   |   |   |--- class: 6
+|   |   |   |   |   |--- std_abs_delta >  8049473881162.75
+|   |   |   |   |   |   |--- class: 7
+|   |   |   |   |--- forward_ratio >  0.90
+|   |   |   |   |   |--- abs_dominant_stride <= 6.00
+|   |   |   |   |   |   |--- mean_cl_delta <= -5.44
+|   |   |   |   |   |   |   |--- mean_delta <= -653.80
+|   |   |   |   |   |   |   |   |--- unique_ip_count <= 14.50
+|   |   |   |   |   |   |   |   |   |--- forward_ratio <= 0.99
+|   |   |   |   |   |   |   |   |   |   |--- mean_cl_delta <= -5109657.38
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |   |   |   |   |--- mean_cl_delta >  -5109657.38
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |--- forward_ratio >  0.99
+|   |   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line <= 11.81
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line >  11.81
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 1
+|   |   |   |   |   |   |   |   |--- unique_ip_count >  14.50
+|   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line <= 6.27
+|   |   |   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |   |   |--- avg_accesses_per_cache_line >  6.27
+|   |   |   |   |   |   |   |   |   |   |--- page_reuse_ratio <= 0.93
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 5
+|   |   |   |   |   |   |   |   |   |   |--- page_reuse_ratio >  0.93
+|   |   |   |   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |--- mean_delta >  -653.80
+|   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |--- mean_cl_delta >  -5.44
+|   |   |   |   |   |   |   |--- delta_entropy <= 0.08
+|   |   |   |   |   |   |   |   |--- std_cl_delta <= 4.06
+|   |   |   |   |   |   |   |   |   |--- mean_cl_delta <= -0.03
+|   |   |   |   |   |   |   |   |   |   |--- class: 2
+|   |   |   |   |   |   |   |   |   |--- mean_cl_delta >  -0.03
+|   |   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta <= 87.00
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta >  87.00
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |--- std_cl_delta >  4.06
+|   |   |   |   |   |   |   |   |   |--- class: 5
+|   |   |   |   |   |   |   |--- delta_entropy >  0.08
+|   |   |   |   |   |   |   |   |--- mean_abs_delta <= 2293137670144.00
+|   |   |   |   |   |   |   |   |   |--- std_cl_delta <= 50943442951.85
+|   |   |   |   |   |   |   |   |   |   |--- class: 4
+|   |   |   |   |   |   |   |   |   |--- std_cl_delta >  50943442951.85
+|   |   |   |   |   |   |   |   |   |   |--- delta_entropy <= 0.31
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |   |--- delta_entropy >  0.31
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |--- mean_abs_delta >  2293137670144.00
+|   |   |   |   |   |   |   |   |   |--- page_reuse_ratio <= 0.97
+|   |   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta <= 75.00
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- max_consecutive_same_delta >  75.00
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |   |   |   |   |   |--- page_reuse_ratio >  0.97
+|   |   |   |   |   |   |   |   |   |   |--- class: 7
+|   |   |   |   |   |--- abs_dominant_stride >  6.00
+|   |   |   |   |   |   |--- dominant_stride_ratio <= 0.84
+|   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |--- dominant_stride_ratio >  0.84
+|   |   |   |   |   |   |   |--- mean_cl_delta <= -5.28
+|   |   |   |   |   |   |   |   |--- mean_abs_delta <= 925149709790.75
+|   |   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |   |   |   |--- mean_abs_delta >  925149709790.75
+|   |   |   |   |   |   |   |   |   |--- class: 2
+|   |   |   |   |   |   |   |--- mean_cl_delta >  -5.28
+|   |   |   |   |   |   |   |   |--- class: 2
