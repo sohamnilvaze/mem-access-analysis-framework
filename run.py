@@ -62,7 +62,10 @@ def train_from_traces():
             print(f"Skipping {file}: Unknown pattern")
 
     final_df = pd.concat(all_features, ignore_index=True)
-    model.train(final_df)
+    # model.train_decision_tree_classifier(final_df)
+    # model.train_random_forest_classifier(final_df)
+    model.train_svc_classifier(final_df)
+    model.train_logistic_regression_classifier(final_df)
     print("\nTraining complete.\n")
 
 # ==============================

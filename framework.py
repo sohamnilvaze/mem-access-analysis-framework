@@ -7,6 +7,11 @@ import matplotlib.pyplot as plt
 from scipy.stats import entropy
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier, export_text
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix
 import seaborn as sns
 import warnings
@@ -121,7 +126,7 @@ class MemoryAccessModel:
         os.makedirs("rules", exist_ok=True)
         os.makedirs("plots", exist_ok=True)
 
-    def export_feature_importance(self, X, shap_values):
+    def export_feature_importance(self, X, shap_values,model_name):
         feature_names = list(X.columns)
         tree_importance = self.model.feature_importances_
         df_tree = pd.DataFrame({"Feature": feature_names, "Tree_Importance": tree_importance})
@@ -134,9 +139,9 @@ class MemoryAccessModel:
         shap_mean = np.mean(shap_array, axis=0)
         df_shap = pd.DataFrame({"Feature": feature_names, "Mean_Abs_SHAP": shap_mean})
         df_final = df_tree.merge(df_shap, on="Feature").sort_values(by="Mean_Abs_SHAP", ascending=False)
-        df_final.to_csv(f"rules/{benchmark}_feature_importance_ranking.csv", index=False)
+        df_final.to_csv(f"rules/{benchmark}_{model_name}_feature_importance_ranking.csv", index=False)
 
-    def plot_feature_separability(self, X, y):
+    def plot_feature_separability(self, X, y,model):
 
         df = X.copy()
         df["Target"] = y
@@ -163,11 +168,24 @@ class MemoryAccessModel:
 
             plt.title(f"Feature Separability: {feature}")
             plt.legend()
-            plt.savefig(f"plots/{benchmark}_separability_{feature}.png")
+            plt.savefig(f"plots/{benchmark}_{model}_separability_{feature}.png")
             plt.close()
+    
+    def save_tree_rules(self, feature_names, filename):
 
-    def train(self, df):
-        print(f"Starting training on {len(df)} samples with {len(df.columns)} features...")
+        from sklearn.tree import export_text
+
+        rules = export_text(self.model, feature_names=list(feature_names))
+
+        with open(filename, "w") as f:
+            f.write("Decision Tree Rules\n")
+            f.write("====================\n\n")
+            f.write(rules)
+
+        print(f"Tree rules saved to {filename}")
+
+    def train_decision_tree_classifier(self, df):
+        print(f"Starting training on {len(df)} samples with {len(df.columns)} features for Decision Tree...")
         X = df.drop(["Target", "Fine_grained_Target"], axis=1)
         y = df["Target"]
         X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
@@ -198,9 +216,213 @@ class MemoryAccessModel:
         except Exception as e:
             print(f"ROC-AUC: Could not calculate (Error: {e})")
 
-        self.plot_feature_separability(X_test, y_test) 
-        
-        joblib.dump(self.model, f"models/{benchmark}_model.pkl")
+        self.plot_feature_separability(X_test, y_test,"decision_tree") 
+        self.save_tree_rules(X.columns, f"rules/{benchmark}_decision_tree_rules.txt")
+        joblib.dump(self.model, f"models/{benchmark}_decision_tree_classifier_model.pkl")
+
+        shap_values = self.explainer.shap_values(X_test)
+        self.export_feature_importance(X_test, shap_values,"decision_tree")
+
+        return self.model
+
+    def train_random_forest_classifier(self, df):
+        print(f"Starting training on {len(df)} samples with {len(df.columns)} features for Random Forest...")
+
+        X = df.drop(["Target", "Fine_grained_Target"], axis=1)
+        y = df["Target"]
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, stratify=y, test_size=0.2, random_state=42
+        )
+
+        param_grid = {
+            "n_estimators": [100, 200],
+            "max_depth": [10, 20, None],
+            "min_samples_leaf": [1, 5, 10],
+            "criterion": ["gini", "entropy"]
+        }
+
+        grid = GridSearchCV(
+            RandomForestClassifier(),
+            param_grid,
+            cv=3,
+            scoring="f1_macro",
+            n_jobs=-1
+        )
+
+        grid.fit(X_train, y_train)
+
+        self.model = grid.best_estimator_
+        self.explainer = shap.TreeExplainer(self.model)
+
+        print("Best Params:", grid.best_params_)
+
+        y_pred = self.model.predict(X_test)
+        y_proba = self.model.predict_proba(X_test)
+
+        print("\n===== TEST METRICS =====")
+        print("Accuracy:", accuracy_score(y_test, y_pred))
+
+        print(f"F1 Macro:         {f1_score(y_test, y_pred, average='macro'):.4f}")
+        print(f"F1 Weighted:      {f1_score(y_test, y_pred, average='weighted'):.4f}")
+
+        print(f"Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}")
+
+        try:
+            macro_roc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='macro')
+            weighted_roc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='weighted')
+
+            print(f"ROC-AUC Macro:    {macro_roc:.4f}")
+            print(f"ROC-AUC Weighted: {weighted_roc:.4f}")
+
+        except Exception as e:
+            print(f"ROC-AUC: Could not calculate (Error: {e})")
+
+        self.plot_feature_separability(X_test, y_test,"random_forest")
+
+        joblib.dump(self.model, f"models/{benchmark}_random_forest_classifier_model.pkl")
+        shap_values = self.explainer.shap_values(X_test)
+        self.export_feature_importance(X_test, shap_values,"random_forest")
+        return self.model
+
+    def train_svc_classifier(self, df):
+
+        print(f"Starting training on {len(df)} samples with {len(df.columns)} features for SVC...")
+
+        X = df.drop(["Target", "Fine_grained_Target"], axis=1)
+        y = df["Target"]
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, stratify=y, test_size=0.2, random_state=42
+        )
+
+        param_grid = {
+            "C": [0.1, 1, 10],
+            "kernel": ["rbf"],
+            "gamma": ["scale", "auto"]
+        }
+
+        grid = GridSearchCV(
+            SVC(probability=True),
+            param_grid,
+            cv=2,
+            scoring="f1_macro",
+            n_jobs=-1,
+            verbose=2
+        )
+
+        grid.fit(X_train, y_train)
+
+        self.model = grid.best_estimator_
+
+        # KernelExplainer for non-tree models
+        self.explainer = shap.KernelExplainer(
+            self.model.predict_proba,
+            shap.sample(X_train, 100)
+        )
+
+        print("Best Params:", grid.best_params_)
+
+        y_pred = self.model.predict(X_test)
+        y_proba = self.model.predict_proba(X_test)
+
+        print("\n===== TEST METRICS =====")
+
+        print("Accuracy:", accuracy_score(y_test, y_pred))
+
+        print(f"F1 Macro:         {f1_score(y_test, y_pred, average='macro'):.4f}")
+        print(f"F1 Weighted:      {f1_score(y_test, y_pred, average='weighted'):.4f}")
+
+        print(f"Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}")
+
+        try:
+            macro_roc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='macro')
+            weighted_roc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='weighted')
+
+            print(f"ROC-AUC Macro:    {macro_roc:.4f}")
+            print(f"ROC-AUC Weighted: {weighted_roc:.4f}")
+
+        except Exception as e:
+            print(f"ROC-AUC: Could not calculate (Error: {e})")
+
+        self.plot_feature_separability(X_test, y_test,"svc")
+
+        joblib.dump(self.model, f"models/{benchmark}_svc_classifier_model.pkl")
+
+        return self.model
+
+    def train_logistic_regression_classifier(self, df):
+
+        print(f"Starting training on {len(df)} samples with {len(df.columns)} features for Logistic Regression...")
+
+        X = df.drop(["Target", "Fine_grained_Target"], axis=1)
+        y = df["Target"]
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, stratify=y, test_size=0.2, random_state=42
+        )
+
+        pipeline = Pipeline([
+            ("scaler", StandardScaler()),
+            ("clf", LogisticRegression(max_iter=2000))
+        ])
+
+        param_grid = {
+            "clf__C": [0.01, 0.1, 1, 10],
+            "clf__penalty": ["l2"],
+            "clf__solver": ["lbfgs", "saga"]
+        }
+
+        grid = GridSearchCV(
+            pipeline,
+            param_grid,
+            cv=2,
+            scoring="f1_macro",
+            n_jobs=-1,
+            verbose=2
+        )
+
+        grid.fit(X_train, y_train)
+
+        self.model = grid.best_estimator_
+
+        # SHAP KernelExplainer (non-tree model)
+        background = shap.sample(X_train, 100)
+        predict_fn = lambda x: self.model.predict_proba(x)
+
+        self.explainer = shap.KernelExplainer(
+            predict_fn, 
+            background
+        )
+
+        print("Best Params:", grid.best_params_)
+
+        y_pred = self.model.predict(X_test)
+        y_proba = self.model.predict_proba(X_test)
+
+        print("\n===== TEST METRICS =====")
+
+        print("Accuracy:", accuracy_score(y_test, y_pred))
+
+        print(f"F1 Macro:         {f1_score(y_test, y_pred, average='macro'):.4f}")
+        print(f"F1 Weighted:      {f1_score(y_test, y_pred, average='weighted'):.4f}")
+
+        print(f"Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}")
+
+        try:
+            macro_roc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='macro')
+            weighted_roc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='weighted')
+
+            print(f"ROC-AUC Macro:    {macro_roc:.4f}")
+            print(f"ROC-AUC Weighted: {weighted_roc:.4f}")
+
+        except Exception as e:
+            print(f"ROC-AUC: Could not calculate (Error: {e})")
+
+        self.plot_feature_separability(X_test, y_test,"logistic_regression")
+
+        joblib.dump(self.model, f"models/{benchmark}_logistic_regression_classifier_model.pkl")
+
         return self.model
 
     def load_model(self, path=f"models/{benchmark}_model.pkl"):
@@ -257,6 +479,14 @@ class MemoryAccessModel:
 
         for r in rules:
             print(" -", r)
+        
+        shap_values = self.explainer(sample)
+        print("\n===== Top influential features for this prediction =====")
+        importance = np.abs(shap_values).mean(axis=0)
+        top_features = np.argsort(importance)[::-1][:5]
+
+        for idx in top_features:
+            print(feature_df.columns[idx], feature_df.iloc[0, idx])
         return final_prediction
 
     def save_decision_path_example(self, sample):
