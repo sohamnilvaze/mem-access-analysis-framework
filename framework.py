@@ -20,7 +20,7 @@ import warnings
 warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-benchmark = "custom"
+benchmark = "npb"  # Set this to your benchmark name for file naming
 
 class TraceProcessor:
     def __init__(self, window_size=500, step_size=250):
@@ -105,13 +105,13 @@ class TraceProcessor:
             feature["mean_stride_to_cl_ratio"] = abs_deltas.mean() / (window["cl_delta"].abs().mean() + 1e-6)
 
             # Page + IP
-            feature["page_reuse_ratio"] = 1 - (window["page"].nunique() / self.WINDOW_SIZE)
-            feature["unique_ip_count"] = window["ip"].nunique()
-            feature["unique_address_ratio"] = window["mem_addr"].nunique() / self.WINDOW_SIZE
+            # feature["page_reuse_ratio"] = 1 - (window["page"].nunique() / self.WINDOW_SIZE)
+            # feature["unique_ip_count"] = window["ip"].nunique()
+            # feature["unique_address_ratio"] = window["mem_addr"].nunique() / self.WINDOW_SIZE
 
             delta_sign = np.sign(deltas.values)
             feature["delta_sign_change_rate"] = np.mean(delta_sign[1:] != delta_sign[:-1])
-            feature["large_jump_ratio"] = (abs_deltas > 4096).mean()
+            # feature["large_jump_ratio"] = (abs_deltas > 4096).mean()
             feature["delta_cv"] = deltas.std() / (abs(deltas.mean()) + 1e-6)
             feature["cl_delta_entropy"] = self.compute_entropy(window["cl_delta"].dropna())
 
@@ -298,8 +298,8 @@ class MemoryAccessModel:
 
         param_grid = {
             "C": [0.1, 1, 10],
-            "kernel": ["rbf"],
-            "gamma": ["scale", "auto"]
+            "kernel": ["rbf","polynomial","sigmoid"],
+            "gamma": [0.01, 0.1, 1,0.3]
         }
 
         grid = GridSearchCV(
