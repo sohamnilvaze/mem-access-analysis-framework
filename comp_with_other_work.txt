@@ -1,0 +1,104 @@
+*** Comparison with some other similar looking research*** 
+
+| Work                                                     | Methodology                           | Objective                                                     | Feature Representation               | Interpretability | Limitations                                                           |
+| -------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------- | ------------------------------------ | ---------------- | --------------------------------------------------------------------- |
+| Learning Memory Access Patterns                          | Deep Learning (RNN/LSTM)              | Predict next memory access for hardware prefetching           | Raw memory address sequences         | ❌ None           | Black-box model, difficult to interpret memory behavior               |
+| ACORN: Accurate Open‑set Recognition for Memory Workload | ML-based workload recognition         | Identify memory workload classes and detect unknown workloads | Spatial locality + sequence features | ❌ Limited        | Focuses on workload recognition rather than pattern-level explanation |
+| Memory Reference Behavior Characterization Studies       | Statistical analysis                  | Understand memory reference behavior of applications          | Statistical metrics                  | ⚠ Partial        | No predictive classification model                                    |
+| Pattern-Aware Memory System Research                     | Architecture-driven pattern detection | Improve memory system performance                             | Hardware-centric metrics             | ❌ None           | Not focused on ML-based analysis                                      |
+| **Proposed Framework (This Work)**                       | Decision Tree + SHAP                  | Interpretable classification of memory access patterns        | Trace-driven statistical features    | ✅ High           | Currently assumes closed-set classes                                  |
+
+
+*** summary of the results obtained till now***
+| Benchmark Suite         | Classes | Dataset Size | Accuracy | F1-Macro | ROC-AUC Macro | Notes                        |
+| ----------------------- | ------- | ------------ | -------- | -------- | ------------- | ---------------------------- |
+| Stream Patterns         | 6       | 7,293        | 0.902    | 0.869    | 0.980         | Synthetic pattern validation |
+| Custom C Programs       | 8       | 45,599       | 0.790    | 0.726    | 0.907         | Mixed access behaviors       |
+| PolyBench               | 8       | 13,609       | 0.992    | 0.985    | 0.998         | Dense linear algebra kernels |
+| NAS Parallel Benchmarks | 5       | 69,990       | 0.995    | 0.995    | 0.999         | Scientific HPC workloads     |
+| Rodinia                 | 5       | 63,313       | 0.999    | 0.999    | 0.999         | Heterogeneous workloads      |
+
+*** Baseline model Comparison ***
+Model                     Accuracy   F1 macro       F1 weighted    ROC-AUC macro    ROC-AUC 
+Decision tree classifier  0.8433     0.8420         0.8341         0.9423           0.9218
+Random forest classifier  0.8438     0.8423         0.8345         0.9439           0.9226  
+Support vector classifier 0.729      0.4782         0.6965         0.8698           0.8847 
+Logistic regression       0.8355     0.8268         0.8265         0.9379           0.9196      
+
+
+** things to be included in paper**
+1) baseline comparison (along with std deviation, p test score, statistical significance testing)
+2) adding explanation examples ( for correct and wrong predictions)
+3) ablation study (remove features and test)
+4) real system use classes
+5) cross Dataset generalisation
+
+
+*** Cross dataset generalisation ***
+
+Model trained on     Custom     Stream    Rodinia   PolyBenchC    NPB 
+Custom                           0.26      0.00       0.125       0.2
+Stream                0.204                0.00       0.125       0.00
+Rodinia               0.08       0.26                 0.125       0.4
+PolyBenchC            0.163      0.13      0.16                   0.2
+NPB                   0.183      0.217     0.5        0.00         
+
+
+*** ablation study ***
+delta_features = [
+    "mean_delta",
+    "std_delta",
+    "mean_abs_delta",
+    "std_abs_delta",
+    "max_abs_delta",
+    "delta_entropy",
+    "dominant_stride_ratio",
+    "abs_dominant_stride",
+    "max_consecutive_same_delta",
+    "stride_change_rate",
+    "delta_cv"
+]
+
+direction_features = [
+    "forward_ratio",
+    "backward_ratio",
+    "delta_sign_change_rate"
+]
+
+cache_features = [
+    "unique_cache_lines",
+    "mean_cl_delta",
+    "std_cl_delta",
+    "cache_line_reuse_ratio",
+    "avg_accesses_per_cache_line",
+    "cl_small_jump_ratio",
+    "mean_stride_to_cl_ratio",
+    "cl_delta_entropy"
+]
+
+memory_footprint_features = [
+    "page_reuse_ratio",
+    "unique_ip_count",
+    "unique_address_ratio",
+    "large_jump_ratio"
+]
+
+*removed*
+
+dataset type        delta_based     diretion_based  cache-level  page level-address_diversity 
+custom               0.84              0.843         0.843               0.843
+stream               0.948             0.964           0.972               0.966
+PolybenchC           0.993             0.993           0.993               0.994
+Rodinia              0.999             0.999           0.999               0.999 
+NPB                  0.998             1.00            0.999               1.00
+
+
+*only*
+
+dataset type        delta_based     diretion_based  cache-level  page level-address_diversity 
+custom               0.844              0.694          0.834              0.69
+stream               0.962             0.657           0.949               0.667
+PolybenchC           0.989             0.898          0.994               0.988
+Rodinia              0.999             0.985           0.995               0.993 
+NPB                  0.999             0.987            0.998               1.00
+

@@ -20,7 +20,7 @@ import warnings
 warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-benchmark = "npb"  # Set this to your benchmark name for file naming
+benchmark = "npb_with_only_page"  # Set this to your benchmark name for file naming
 
 class TraceProcessor:
     def __init__(self, window_size=500, step_size=250):
@@ -75,45 +75,45 @@ class TraceProcessor:
             feature = {}
             
             # Delta features
-            feature["mean_delta"] = deltas.mean()
-            feature["std_delta"] = deltas.std()
-            feature["mean_abs_delta"] = abs_deltas.mean()
-            feature["std_abs_delta"] = abs_deltas.std()
-            feature["max_abs_delta"] = abs_deltas.max()
-            feature["delta_entropy"] = self.compute_entropy(deltas)
+            # feature["mean_delta"] = deltas.mean()
+            # feature["std_delta"] = deltas.std()
+            # feature["mean_abs_delta"] = abs_deltas.mean()
+            # feature["std_abs_delta"] = abs_deltas.std()
+            # feature["max_abs_delta"] = abs_deltas.max()
+            # feature["delta_entropy"] = self.compute_entropy(deltas)
             
             stride_counts = deltas.value_counts()
-            feature["dominant_stride_ratio"] = stride_counts.max() / len(deltas)
-            feature["abs_dominant_stride"] = abs(stride_counts.idxmax())
-            feature["max_consecutive_same_delta"] = self.max_consecutive_run(deltas.values)
-            feature["stride_change_rate"] = np.mean(deltas.values[1:] != deltas.values[:-1])
+            # feature["dominant_stride_ratio"] = stride_counts.max() / len(deltas)
+            # feature["abs_dominant_stride"] = abs(stride_counts.idxmax())
+            # feature["max_consecutive_same_delta"] = self.max_consecutive_run(deltas.values)
+            # feature["stride_change_rate"] = np.mean(deltas.values[1:] != deltas.values[:-1])
 
             # Direction
-            feature["forward_ratio"] = (window["direction"] == 1).mean()
-            feature["backward_ratio"] = (window["direction"] == -1).mean()
+            # feature["forward_ratio"] = (window["direction"] == 1).mean()
+            # feature["backward_ratio"] = (window["direction"] == -1).mean()
 
             # Cache-level
             unique_cache_lines = window["cache_line"].nunique()
-            feature["unique_cache_lines"] = unique_cache_lines
-            feature["mean_cl_delta"] = window["cl_delta"].mean()
-            feature["std_cl_delta"] = window["cl_delta"].std()
-            feature["cache_line_reuse_ratio"] = 1 - (unique_cache_lines / self.WINDOW_SIZE)
-            feature["avg_accesses_per_cache_line"] = self.WINDOW_SIZE / max(unique_cache_lines, 1)
+            # feature["unique_cache_lines"] = unique_cache_lines
+            # feature["mean_cl_delta"] = window["cl_delta"].mean()
+            # feature["std_cl_delta"] = window["cl_delta"].std()
+            # feature["cache_line_reuse_ratio"] = 1 - (unique_cache_lines / self.WINDOW_SIZE)
+            # feature["avg_accesses_per_cache_line"] = self.WINDOW_SIZE / max(unique_cache_lines, 1)
 
-            cl_deltas = window["cache_line"].diff().dropna()
-            feature["cl_small_jump_ratio"] = (cl_deltas.abs() <= 1).mean()
-            feature["mean_stride_to_cl_ratio"] = abs_deltas.mean() / (window["cl_delta"].abs().mean() + 1e-6)
+            # cl_deltas = window["cache_line"].diff().dropna()
+            # feature["cl_small_jump_ratio"] = (cl_deltas.abs() <= 1).mean()
+            # feature["mean_stride_to_cl_ratio"] = abs_deltas.mean() / (window["cl_delta"].abs().mean() + 1e-6)
 
             # Page + IP
-            # feature["page_reuse_ratio"] = 1 - (window["page"].nunique() / self.WINDOW_SIZE)
-            # feature["unique_ip_count"] = window["ip"].nunique()
-            # feature["unique_address_ratio"] = window["mem_addr"].nunique() / self.WINDOW_SIZE
+            feature["page_reuse_ratio"] = 1 - (window["page"].nunique() / self.WINDOW_SIZE)
+            feature["unique_ip_count"] = window["ip"].nunique()
+            feature["unique_address_ratio"] = window["mem_addr"].nunique() / self.WINDOW_SIZE
 
             delta_sign = np.sign(deltas.values)
-            feature["delta_sign_change_rate"] = np.mean(delta_sign[1:] != delta_sign[:-1])
-            # feature["large_jump_ratio"] = (abs_deltas > 4096).mean()
-            feature["delta_cv"] = deltas.std() / (abs(deltas.mean()) + 1e-6)
-            feature["cl_delta_entropy"] = self.compute_entropy(window["cl_delta"].dropna())
+            # feature["delta_sign_change_rate"] = np.mean(delta_sign[1:] != delta_sign[:-1])
+            feature["large_jump_ratio"] = (abs_deltas > 4096).mean()
+            # feature["delta_cv"] = deltas.std() / (abs(deltas.mean()) + 1e-6)
+            # feature["cl_delta_entropy"] = self.compute_entropy(window["cl_delta"].dropna())
 
             features.append(feature)
         return pd.DataFrame(features)
