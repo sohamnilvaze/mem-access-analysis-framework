@@ -102,3 +102,11 @@ PolybenchC           0.989             0.898          0.994               0.988
 Rodinia              0.999             0.985           0.995               0.993 
 NPB                  0.999             0.987            0.998               0.993
 
+
+* real world system use cases **
+
+so here we have use custom and stream model as the base model and now we will be esting these
+models against completely unseen memory traces belonging to 
+1) polybench: gemm, atax
+2) rodinia: bfs, particlefilter, srad
+3) npb: cg  
