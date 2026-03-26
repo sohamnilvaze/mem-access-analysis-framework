@@ -6,32 +6,26 @@ Decision Tree Rules
 |   |   |--- delta_sign_change_rate <= 0.68
 |   |   |   |--- max_abs_delta <= 45583851061248.00
 |   |   |   |   |--- abs_dominant_stride <= 6.00
-|   |   |   |   |   |--- delta_entropy <= 3.20
+|   |   |   |   |   |--- max_abs_delta <= 22700115125248.00
 |   |   |   |   |   |   |--- max_consecutive_same_delta <= 103.50
 |   |   |   |   |   |   |   |--- class: 1
 |   |   |   |   |   |   |--- max_consecutive_same_delta >  103.50
-|   |   |   |   |   |   |   |--- forward_ratio <= 0.30
-|   |   |   |   |   |   |   |   |--- class: 3
-|   |   |   |   |   |   |   |--- forward_ratio >  0.30
+|   |   |   |   |   |   |   |--- avg_accesses_per_cache_line <= 257.81
 |   |   |   |   |   |   |   |   |--- class: 4
-|   |   |   |   |   |--- delta_entropy >  3.20
+|   |   |   |   |   |   |   |--- avg_accesses_per_cache_line >  257.81
+|   |   |   |   |   |   |   |   |--- class: 3
+|   |   |   |   |   |--- max_abs_delta >  22700115125248.00
 |   |   |   |   |   |   |--- class: 2
 |   |   |   |   |--- abs_dominant_stride >  6.00
-|   |   |   |   |   |--- page_reuse_ratio <= 0.99
+|   |   |   |   |   |--- avg_accesses_per_cache_line <= 3.85
 |   |   |   |   |   |   |--- class: 5
-|   |   |   |   |   |--- page_reuse_ratio >  0.99
-|   |   |   |   |   |   |--- mean_delta <= 17.54
-|   |   |   |   |   |   |   |--- class: 2
-|   |   |   |   |   |   |--- mean_delta >  17.54
-|   |   |   |   |   |   |   |--- max_abs_delta <= 22699688591648.00
-|   |   |   |   |   |   |   |   |--- class: 5
-|   |   |   |   |   |   |   |--- max_abs_delta >  22699688591648.00
-|   |   |   |   |   |   |   |   |--- class: 2
+|   |   |   |   |   |--- avg_accesses_per_cache_line >  3.85
+|   |   |   |   |   |   |--- class: 2
 |   |   |   |--- max_abs_delta >  45583851061248.00
 |   |   |   |   |--- max_abs_delta <= 45895202635776.00
-|   |   |   |   |   |--- max_abs_delta <= 45813497593856.00
+|   |   |   |   |   |--- max_consecutive_same_delta <= 32.00
 |   |   |   |   |   |   |--- class: 5
-|   |   |   |   |   |--- max_abs_delta >  45813497593856.00
+|   |   |   |   |   |--- max_consecutive_same_delta >  32.00
 |   |   |   |   |   |   |--- class: 2
 |   |   |   |   |--- max_abs_delta >  45895202635776.00
 |   |   |   |   |   |--- class: 3
@@ -43,13 +37,25 @@ Decision Tree Rules
 |   |--- max_abs_delta >  45945523798016.00
 |   |   |--- class: 4
 |--- max_abs_delta >  46030307459072.00
-|   |--- max_abs_delta <= 46161616437248.00
-|   |   |--- class: 1
-|   |--- max_abs_delta >  46161616437248.00
+|   |--- avg_accesses_per_cache_line <= 15.39
 |   |   |--- max_abs_delta <= 46281919561728.00
-|   |   |   |--- class: 5
+|   |   |   |--- unique_ip_count <= 8.50
+|   |   |   |   |--- class: 1
+|   |   |   |--- unique_ip_count >  8.50
+|   |   |   |   |--- class: 5
 |   |   |--- max_abs_delta >  46281919561728.00
-|   |   |   |--- max_abs_delta <= 46455593107456.00
+|   |   |   |--- page_reuse_ratio <= 0.98
 |   |   |   |   |--- class: 4
-|   |   |   |--- max_abs_delta >  46455593107456.00
+|   |   |   |--- page_reuse_ratio >  0.98
+|   |   |   |   |--- class: 1
+|   |--- avg_accesses_per_cache_line >  15.39
+|   |   |--- backward_ratio <= 0.29
+|   |   |   |--- unique_address_ratio <= 0.42
+|   |   |   |   |--- class: 5
+|   |   |   |--- unique_address_ratio >  0.42
+|   |   |   |   |--- class: 1
+|   |   |--- backward_ratio >  0.29
+|   |   |   |--- mean_stride_to_cl_ratio <= 63.94
+|   |   |   |   |--- class: 4
+|   |   |   |--- mean_stride_to_cl_ratio >  63.94
 |   |   |   |   |--- class: 1

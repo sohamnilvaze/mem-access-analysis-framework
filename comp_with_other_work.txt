@@ -37,11 +37,11 @@ Logistic regression       0.8355     0.8268         0.8265         0.9379       
 *** Cross dataset generalisation ***
 
 Model trained on     Custom     Stream    Rodinia   PolyBenchC    NPB 
-Custom                           0.26      0.00       0.125       0.2
-Stream                0.204                0.00       0.125       0.00
-Rodinia               0.08       0.26                 0.125       0.4
-PolyBenchC            0.163      0.13      0.16                   0.2
-NPB                   0.183      0.217     0.5        0.00         
+Custom                  -        0.26       0.00       0.125       0.2
+Stream                0.204        -        0.00       0.125       0.00
+Rodinia               0.08       0.26         -        0.125       0.4
+PolyBenchC            0.163      0.13       0.16          -        0.2
+NPB                   0.183      0.217      0.5        0.00          -
 
 
 *** ablation study ***
@@ -110,3 +110,58 @@ models against completely unseen memory traces belonging to
 1) polybench: gemm, atax
 2) rodinia: bfs, particlefilter, srad
 3) npb: cg  
+
+
+kernel             dataset              prediction           interpretation                                                 top features                                                                                                                          
+gemm               PolybenchC          block access         - max_consecutive_same_delta (476.000) > 198.000             forward_ratio, max_consecutive_same_delta, dominant_stride_ratio,abs_dominant_stride,unique_cache_lines                    
+                                                            - forward_ratio (0.964) <= 0.999
+                                                            - dominant_stride_ratio (0.952) > 0.945
+                                                            - abs_dominant_stride (8.000) > 6.000
+                                                            - abs_dominant_stride (8.000) <= 12.000
+                                                            - mean_cl_delta (-1425977428.076) <= 16570070.000    
+
+
+atax             v PolyBenchC         column major          - max_consecutive_same_delta (375.000) > 198.000            forward_ratio, max_consecutive_same_delta,dominant_stride_ratio,abs_dominant_stride,mean_abs_delta                        
+                                                            - forward_ratio (0.860) <= 0.999
+                                                            - dominant_stride_ratio (0.750) <= 0.945
+                                                            - forward_ratio (0.860) <= 0.967
+                                                            - mean_abs_delta (911658598259.936) <= 1204448002048.000
+                                                            - delta_entropy (1.683) > 1.106                    
+
+bfs               Rodinia             indirect              - max_consecutive_same_delta (1.000) <= 198.000             dominant_stride_ratio, max_consecutive_same_delta, forward_ratio, abs_dominant_stride, mean_abs_delta
+                                                            - dominant_stride_ratio (0.100) <= 0.501
+                                                            - cl_small_jump_ratio (0.778) > 0.498
+                                                            - stride_change_rate (1.000) > 0.998                                                            
+
+particlefilter    Rodinia             random access         - max_consecutive_same_delta (479.000) > 97.000             forward_ratio, max_consecutive_same_delta, cl_small_jump_ratio, abs_dominant_stride, mean_abs_delta
+                                                            - forward_ratio (0.026) <= 0.999
+                                                            - dominant_stride_ratio (0.958) > 0.932
+                                                            - abs_dominant_stride (0.000) <= 6.000
+                                                            - backward_ratio (0.016) <= 0.499
+                                                            - mean_abs_delta (1289766149372.984) > 560117710848.000
+                                                            - unique_ip_count (16.000) > 14.500
+                                                            - cl_small_jump_ratio (0.966) <= 0.973
+                                                            - cl_small_jump_ratio (0.966) > 0.951
+                                                            - cl_delta_entropy (0.214) <= 0.516                                               
+
+srad             Rodinia              column major          - max_consecutive_same_delta (1.000) <=198.000             dominant_stride_ratio, cl_small_jump_ratio, max_consecutive_same_delta, std_cl_delta, forward_ratio
+                                                            - dominant_stride_ratio (0.128) <= 0.501
+                                                            - cl_small_jump_ratio (0.012) <= 0.498
+                                                            - std_cl_delta (706271269520.319) > 79998799872.000
+                                                            - mean_abs_delta (44884691456237.570) > 13684182908928.000          
+
+cg               NPB                  block access          - max_consecutive_same_delta (1.000) <= 198.000            dominant_stride_ratio, cl_small_jump_ratio, std_cl_delta, forward_ratio, max_consecutive_same_delta
+                                                            - dominant_stride_ratio (0.140) <= 0.501
+                                                            - cl_small_jump_ratio (0.371) <= 0.498
+                                                            - std_cl_delta (415629459894.922) > 79998799872.000
+                                                            - mean_abs_delta (15256572833836.943) > 13684182908928.000
+                                        
+
+
+Description:-
+1) gemm: blocked matrix multiplication
+2) atax:- matrix vector multiplication with column major access on sparse matrix
+3) bfs:- breadth first search on graphs, random/indirect access due to pointer-chasing
+4) particlefilter: monte carlo localization, particles stored in unstructed arrays
+5) srad: row-major sequential 
+6) cg:- sparse matrix-vector multiply, sequential within rows and jumps between   

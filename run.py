@@ -12,14 +12,16 @@ warnings.filterwarnings("ignore")
 # ==============================
 # CONFIG (Shared between Train/Test)
 # ==============================
-benchmark = "npb"
-TRAINING_TRACE_FOLDER = "training_traces_npb"
-IGNORE_Features = "page_based"
-MODEL_SAVE_PATH = f"models/{benchmark}_{IGNORE_Features}_model.pkl"
+benchmark = "custom"
+TRAINING_TRACE_FOLDER = "training_traces2"
+# IGNORE_Features = "page_based"
+# MODEL_SAVE_PATH = f"models/{benchmark}_decision_tree_classifier_model.pkl"
+MODEL_SAVE_PATH = f"models/{benchmark}_model.pkl"
+
 
 # CRITICAL: These MUST be the same for both training and testing
 WINDOW_SIZE = 500
-STEP_SIZE = 100
+STEP_SIZE = 250
 
 def assign_label(file):
 

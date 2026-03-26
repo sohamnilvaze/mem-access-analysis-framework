@@ -16,11 +16,13 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_m
 import seaborn as sns
 import warnings
 
+custom_class_mapping = { 1 : "ba",2 : "seq",3 : "std",4:"indirect",5:"random access",6:"linked list",7:"column major",8:"row major" }
+
 # Suppress annoying warnings
 warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-benchmark = "npb_with_only_page"  # Set this to your benchmark name for file naming
+benchmark = "custom"  # Set this to your benchmark name for file naming
 
 class TraceProcessor:
     def __init__(self, window_size=500, step_size=250):
@@ -75,34 +77,34 @@ class TraceProcessor:
             feature = {}
             
             # Delta features
-            # feature["mean_delta"] = deltas.mean()
-            # feature["std_delta"] = deltas.std()
-            # feature["mean_abs_delta"] = abs_deltas.mean()
-            # feature["std_abs_delta"] = abs_deltas.std()
-            # feature["max_abs_delta"] = abs_deltas.max()
-            # feature["delta_entropy"] = self.compute_entropy(deltas)
+            feature["mean_delta"] = deltas.mean()
+            feature["std_delta"] = deltas.std()
+            feature["mean_abs_delta"] = abs_deltas.mean()
+            feature["std_abs_delta"] = abs_deltas.std()
+            feature["max_abs_delta"] = abs_deltas.max()
+            feature["delta_entropy"] = self.compute_entropy(deltas)
             
             stride_counts = deltas.value_counts()
-            # feature["dominant_stride_ratio"] = stride_counts.max() / len(deltas)
-            # feature["abs_dominant_stride"] = abs(stride_counts.idxmax())
-            # feature["max_consecutive_same_delta"] = self.max_consecutive_run(deltas.values)
-            # feature["stride_change_rate"] = np.mean(deltas.values[1:] != deltas.values[:-1])
+            feature["dominant_stride_ratio"] = stride_counts.max() / len(deltas)
+            feature["abs_dominant_stride"] = abs(stride_counts.idxmax())
+            feature["max_consecutive_same_delta"] = self.max_consecutive_run(deltas.values)
+            feature["stride_change_rate"] = np.mean(deltas.values[1:] != deltas.values[:-1])
 
             # Direction
-            # feature["forward_ratio"] = (window["direction"] == 1).mean()
-            # feature["backward_ratio"] = (window["direction"] == -1).mean()
+            feature["forward_ratio"] = (window["direction"] == 1).mean()
+            feature["backward_ratio"] = (window["direction"] == -1).mean()
 
             # Cache-level
             unique_cache_lines = window["cache_line"].nunique()
-            # feature["unique_cache_lines"] = unique_cache_lines
-            # feature["mean_cl_delta"] = window["cl_delta"].mean()
-            # feature["std_cl_delta"] = window["cl_delta"].std()
-            # feature["cache_line_reuse_ratio"] = 1 - (unique_cache_lines / self.WINDOW_SIZE)
-            # feature["avg_accesses_per_cache_line"] = self.WINDOW_SIZE / max(unique_cache_lines, 1)
+            feature["unique_cache_lines"] = unique_cache_lines
+            feature["mean_cl_delta"] = window["cl_delta"].mean()
+            feature["std_cl_delta"] = window["cl_delta"].std()
+            feature["cache_line_reuse_ratio"] = 1 - (unique_cache_lines / self.WINDOW_SIZE)
+            feature["avg_accesses_per_cache_line"] = self.WINDOW_SIZE / max(unique_cache_lines, 1)
 
-            # cl_deltas = window["cache_line"].diff().dropna()
-            # feature["cl_small_jump_ratio"] = (cl_deltas.abs() <= 1).mean()
-            # feature["mean_stride_to_cl_ratio"] = abs_deltas.mean() / (window["cl_delta"].abs().mean() + 1e-6)
+            cl_deltas = window["cache_line"].diff().dropna()
+            feature["cl_small_jump_ratio"] = (cl_deltas.abs() <= 1).mean()
+            feature["mean_stride_to_cl_ratio"] = abs_deltas.mean() / (window["cl_delta"].abs().mean() + 1e-6)
 
             # Page + IP
             feature["page_reuse_ratio"] = 1 - (window["page"].nunique() / self.WINDOW_SIZE)
@@ -110,10 +112,10 @@ class TraceProcessor:
             feature["unique_address_ratio"] = window["mem_addr"].nunique() / self.WINDOW_SIZE
 
             delta_sign = np.sign(deltas.values)
-            # feature["delta_sign_change_rate"] = np.mean(delta_sign[1:] != delta_sign[:-1])
+            feature["delta_sign_change_rate"] = np.mean(delta_sign[1:] != delta_sign[:-1])
             feature["large_jump_ratio"] = (abs_deltas > 4096).mean()
-            # feature["delta_cv"] = deltas.std() / (abs(deltas.mean()) + 1e-6)
-            # feature["cl_delta_entropy"] = self.compute_entropy(window["cl_delta"].dropna())
+            feature["delta_cv"] = deltas.std() / (abs(deltas.mean()) + 1e-6)
+            feature["cl_delta_entropy"] = self.compute_entropy(window["cl_delta"].dropna())
 
             features.append(feature)
         return pd.DataFrame(features)
@@ -462,7 +464,6 @@ class MemoryAccessModel:
         return explanation
 
     def predict_trace(self, feature_df):
-        # Ensure we suppress sklearn feature name warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             predictions = self.model.predict(feature_df)
@@ -471,22 +472,47 @@ class MemoryAccessModel:
         unique, counts = np.unique(predictions, return_counts=True)
         final_prediction = unique[np.argmax(counts)]
         print("\n===== TRACE-LEVEL SUMMARY =====")
-        print("Majority Class:", final_prediction)
-        print("\n===== EXPLANATION =====")
+        print("Majority Class:", custom_class_mapping[final_prediction])
+        print("\n===== DECISION TREE RULES =====")
 
         sample = feature_df.iloc[[0]]
         rules = self.explain_prediction(sample)
-
         for r in rules:
             print(" -", r)
         
-        shap_values = self.explainer(sample)
-        print("\n===== Top influential features for this prediction =====")
-        importance = np.abs(shap_values).mean(axis=0)
-        top_features = np.argsort(importance)[::-1][:5]
-
-        for idx in top_features:
-            print(feature_df.columns[idx], feature_df.iloc[0, idx])
+        # FIXED: Proper SHAP handling for multi-class tree models
+        shap_values = self.explainer.shap_values(sample)
+        
+        print("Computing SHAP feature importance...")
+        
+        # Handle multi-class SHAP output properly
+        if isinstance(shap_values, list):  # List of arrays (one per class)
+            # Mean absolute SHAP across all classes
+            shap_array = np.mean([np.abs(sv.values if hasattr(sv, 'values') else sv) 
+                                for sv in shap_values], axis=0)
+        else:  # Single Explanation object or array
+            if hasattr(shap_values, 'values'):
+                shap_array = np.abs(shap_values.values)
+            else:
+                shap_array = np.abs(shap_values)
+        
+        # Ensure 2D: (n_samples, n_features)
+        if shap_array.ndim == 3:
+            shap_array = np.mean(np.abs(shap_array), axis=2)
+        
+        importance = np.mean(np.abs(shap_array), axis=0)  # (n_features,)
+        top_indices = np.argsort(importance)[::-1][:5]
+        
+        print(f"SHAP array final shape: {shap_array.shape}")
+        print("\n===== TOP 5 FEATURES (Value | SHAP Impact) =====")
+        
+        for idx in top_indices:
+            feat_name = feature_df.columns[idx]
+            feat_val = float(feature_df.iloc[0, idx])  # Convert to scalar float
+            shap_impact = float(np.mean(np.abs(shap_array[0, idx])))  # Scalar float
+            
+            print(f"{feat_name:>25}: {feat_val:10.3f} | SHAP: {shap_impact:8.4f}")
+        
         return final_prediction
 
     def save_decision_path_example(self, sample):
