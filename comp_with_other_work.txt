@@ -9,7 +9,7 @@
 | **Proposed Framework (This Work)**                       | Decision Tree + SHAP                  | Interpretable classification of memory access patterns        | Trace-driven statistical features    | ✅ High           | Currently assumes closed-set classes                                  |
 
 
-*** summary of the results obtained till now***
+*** summary of the results obtained till now usinf decision tree classifier***
 | Benchmark Suite         | Classes | Dataset Size | Accuracy | F1-Macro | ROC-AUC Macro | Notes                        |
 | ----------------------- | ------- | ------------ | -------- | -------- | ------------- | ---------------------------- |
 | Stream Patterns         | 6       | 7,293        | 0.902    | 0.869    | 0.980         | Synthetic pattern validation |
@@ -19,15 +19,26 @@
 | Rodinia                 | 5       | 63,313       | 0.999    | 0.999    | 0.999         | Heterogeneous workloads      |
 
 *** Baseline model Comparison ***
-Model                     Accuracy   F1 macro       F1 weighted    ROC-AUC macro    ROC-AUC 
-Decision tree classifier  0.8433     0.8420         0.8341         0.9423           0.9218
-Random forest classifier  0.8438     0.8423         0.8345         0.9439           0.9226  
-Support vector classifier 0.729      0.4782         0.6965         0.8698           0.8847 
-Logistic regression       0.8355     0.8268         0.8265         0.9379           0.9196      
+Model                     Accuracy   F1 macro       F1 weighted    ROC-AUC macro    ROC-AUC  mean scores(grid_search for cv=5)  standard deviation 
+Decision tree classifier  0.8433     0.8420         0.8341         0.9423           0.9218      0.8299                               0.0062
+Random forest classifier  0.8438     0.8423         0.8345         0.9439           0.9226      0.8342                               0.0083
+Support vector classifier 0.729      0.4782         0.6965         0.8698           0.8847      0.4665                               0.0199
+Logistic regression       0.8355     0.8268         0.8265         0.9379           0.9196      0.8040                               0.0103 
+
+
+mode1 1  model 2   t-test    wilcoxon     interpretation
+dt        rf       0.02246   0.02734       rf and dt are not equal, one is better than others(see mean scores)
+dt        svc      0.00000                 decision tree >>>> svc, decision tree clearly dominates
+dt        lg       0.00000                 one clearly dominates 
+rf        svc      0.00000                 one clearly dominates
+rf        lg       0.00000                 one clearly dominates
+svc       lg       0.00000                 one clearly dominates
+
+all models are statistically different.
 
 
 ** things to be included in paper**
-1) baseline comparison (along with std deviation, p test score, statistical significance testing)
+1) baseline comparison (along with std deviation, p test score, statistical significance testing) 
 2) adding explanation examples ( for correct and wrong predictions)
 3) ablation study (remove features and test)
 4) real system use classes
@@ -43,6 +54,7 @@ Rodinia               0.08       0.26         -        0.125       0.4
 PolyBenchC            0.163      0.13       0.16          -        0.2
 NPB                   0.183      0.217      0.5        0.00          -
 
+interpretation: Low cross-dataset accuracy arises due to differences in memory behavior distributions across benchmark suites
 
 *** ablation study ***
 delta_features = [
@@ -113,12 +125,12 @@ models against completely unseen memory traces belonging to
 
 
 kernel             dataset              prediction           interpretation                                                 top features                                                                                                                          
-gemm               PolybenchC          block access         - max_consecutive_same_delta (476.000) > 198.000             forward_ratio, max_consecutive_same_delta, dominant_stride_ratio,abs_dominant_stride,unique_cache_lines                    
-                                                            - forward_ratio (0.964) <= 0.999
-                                                            - dominant_stride_ratio (0.952) > 0.945
-                                                            - abs_dominant_stride (8.000) > 6.000
-                                                            - abs_dominant_stride (8.000) <= 12.000
-                                                            - mean_cl_delta (-1425977428.076) <= 16570070.000    
+gemm               PolybenchC          block access-87.36%   - max_consecutive_same_delta (476.000) > 198.000             forward_ratio, max_consecutive_same_delta, dominant_stride_ratio,abs_dominant_stride,unique_cache_lines                    
+                                       linked list-10.11%    - forward_ratio (0.964) <= 0.999
+                                        std: 2.07%           - dominant_stride_ratio (0.952) > 0.945
+                                        indirect: 0.23%      - abs_dominant_stride (8.000) > 6.000
+                                        col major: 0.23%     - abs_dominant_stride (8.000) <= 12.000
+                                                             - mean_cl_delta (-1425977428.076) <= 16570070.000    
 
 
 atax             v PolyBenchC         column major          - max_consecutive_same_delta (375.000) > 198.000            forward_ratio, max_consecutive_same_delta,dominant_stride_ratio,abs_dominant_stride,mean_abs_delta                        
@@ -128,40 +140,40 @@ atax             v PolyBenchC         column major          - max_consecutive_sa
                                                             - mean_abs_delta (911658598259.936) <= 1204448002048.000
                                                             - delta_entropy (1.683) > 1.106                    
 
-bfs               Rodinia             indirect              - max_consecutive_same_delta (1.000) <= 198.000             dominant_stride_ratio, max_consecutive_same_delta, forward_ratio, abs_dominant_stride, mean_abs_delta
-                                                            - dominant_stride_ratio (0.100) <= 0.501
-                                                            - cl_small_jump_ratio (0.778) > 0.498
-                                                            - stride_change_rate (1.000) > 0.998                                                            
+bfs               Rodinia             linked-list-100%      - max_consecutive_same_delta (1.000) <= 68.500              max_consecutive_same_delta,abs_dominant_stride,backward_ratio,forward_ratio,cl_small_jump_ratio
+                                                            - abs_dominant_stride (46634993240064.000) > 6.000
+                                                            - cl_small_jump_ratio (0.778) > 0.318
+                                                            - stride_change_rate (1.000) > 0.569                                                          
 
-particlefilter    Rodinia             random access         - max_consecutive_same_delta (479.000) > 97.000             forward_ratio, max_consecutive_same_delta, cl_small_jump_ratio, abs_dominant_stride, mean_abs_delta
-                                                            - forward_ratio (0.026) <= 0.999
-                                                            - dominant_stride_ratio (0.958) > 0.932
-                                                            - abs_dominant_stride (0.000) <= 6.000
-                                                            - backward_ratio (0.016) <= 0.499
-                                                            - mean_abs_delta (1289766149372.984) > 560117710848.000
-                                                            - unique_ip_count (16.000) > 14.500
-                                                            - cl_small_jump_ratio (0.966) <= 0.973
-                                                            - cl_small_jump_ratio (0.966) > 0.951
-                                                            - cl_delta_entropy (0.214) <= 0.516                                               
+particlefilter    Rodinia             random access:55.29%  - max_consecutive_same_delta (479.000) > 68.500             dominant_stride_ratio,backward_ratio,max_consecutive_same_delta,unique_ip_count,forward_ratio
+                                      linked list:19.23%    - backward_ratio (0.016) > 0.001
+                                      std: 8.61%            - cl_small_jump_ratio (0.966) > 0.951
+                                      seq:7.68%             - dominant_stride_ratio (0.958) <= 0.966
+                                      indirect:7.51%        - mean_abs_delta (1289766149372.984) > 107.880
+                                      col major: 1.68%      - unique_ip_count (16.000) > 14.500
+                                               
 
-srad             Rodinia              column major          - max_consecutive_same_delta (1.000) <=198.000             dominant_stride_ratio, cl_small_jump_ratio, max_consecutive_same_delta, std_cl_delta, forward_ratio
-                                                            - dominant_stride_ratio (0.128) <= 0.501
-                                                            - cl_small_jump_ratio (0.012) <= 0.498
-                                                            - std_cl_delta (706271269520.319) > 79998799872.000
-                                                            - mean_abs_delta (44884691456237.570) > 13684182908928.000          
+srad             Rodinia              column major:94.67%   - max_consecutive_same_delta (1.000) <= 68.500            cl_small_jump_ratio,backward_ratio,max_consecutive_same_delta,cl_delta_entropy,delta_entropy
+                                      random:4.18%          - abs_dominant_stride (45410325687640.000) > 6.000
+                                      block:1.14%           - cl_small_jump_ratio (0.012) <= 0.318
+                                                            - cl_delta_entropy (2.678) > 2.372
+                                                            - delta_entropy (2.304) <= 6.155
+                                                                     
 
-cg               NPB                  block access          - max_consecutive_same_delta (1.000) <= 198.000            dominant_stride_ratio, cl_small_jump_ratio, std_cl_delta, forward_ratio, max_consecutive_same_delta
-                                                            - dominant_stride_ratio (0.140) <= 0.501
-                                                            - cl_small_jump_ratio (0.371) <= 0.498
-                                                            - std_cl_delta (415629459894.922) > 79998799872.000
-                                                            - mean_abs_delta (15256572833836.943) > 13684182908928.000
+cg               NPB                  block access:49.46%   - max_consecutive_same_delta (1.000) <= 68.500            max_consecutive_same_delta,abs_dominant_stride,backward_ratio,forward_ratio,cl_small_jump_ratio
+                                      indirect:45.46%       - abs_dominant_stride (8.000) > 6.000 
+                                      linked list: 3.04%    - cl_small_jump_ratio (0.371) > 0.318
+                                      ba: 1.97%             - stride_change_rate (1.000) > 0.569
+                                      col major: 0.07%                      
                                         
 
 
 Description:-
-1) gemm: blocked matrix multiplication
-2) atax:- matrix vector multiplication with column major access on sparse matrix
-3) bfs:- breadth first search on graphs, random/indirect access due to pointer-chasing
-4) particlefilter: monte carlo localization, particles stored in unstructed arrays
-5) srad: row-major sequential 
-6) cg:- sparse matrix-vector multiply, sequential within rows and jumps between   
+1) gemm: blocked matrix multiplication , correctly identified
+2) atax:- matrix vector multiplication with column major access on sparse matrix, 
+3) bfs:- breadth first search on graphs, random/indirect access due to pointer-chasing, correctly identified
+4) particlefilter: monte carlo localization, particles stored in unstructed arrays, correctly identified
+5) srad: row-major sequential , misclassified as column major misclassified as column-major due to structural similarity between row-major and column-major access patterns under stride-based feature representation
+6) cg:- sparse matrix-vector multiply, sequential within rows and jumps between, classified as block access due to localized sequential accesses within sparse rows, while also exhibiting indirect behavior due to irregular jumps across rows
+
+Overall, the model demonstrates strong generalization to unseen workloads, accurately capturing both dominant and hybrid memory access behaviors. High-confidence predictions are observed for structured workloads (e.g., GEMM, BFS), while mixed patterns (e.g., CG) result in distributed predictions, reflecting the inherent complexity of real-world memory access patterns.

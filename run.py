@@ -15,8 +15,8 @@ warnings.filterwarnings("ignore")
 benchmark = "custom"
 TRAINING_TRACE_FOLDER = "training_traces2"
 # IGNORE_Features = "page_based"
-# MODEL_SAVE_PATH = f"models/{benchmark}_decision_tree_classifier_model.pkl"
-MODEL_SAVE_PATH = f"models/{benchmark}_model.pkl"
+MODEL_SAVE_PATH = f"models/{benchmark}_decision_tree_classifier_model.pkl"
+# MODEL_SAVE_PATH = f"models/{benchmark}_model.pkl"
 
 
 # CRITICAL: These MUST be the same for both training and testing
@@ -91,9 +91,10 @@ def train_from_traces():
 
     final_df = pd.concat(all_features, ignore_index=True)
     model.train_decision_tree_classifier(final_df)
-    # model.train_random_forest_classifier(final_df)
-    # model.train_svc_classifier(final_df)
-    # model.train_logistic_regression_classifier(final_df)
+    model.train_random_forest_classifier(final_df)
+    model.train_svc_classifier(final_df)
+    model.train_logistic_regression_classifier(final_df)
+    model.compare_models()
     print("\nTraining complete.\n")
 
 # ==============================

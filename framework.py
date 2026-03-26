@@ -4,7 +4,7 @@ import shap
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import entropy
+from scipy.stats import entropy, ttest_rel, wilcoxon
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier, export_text
 from sklearn.ensemble import RandomForestClassifier
@@ -124,9 +124,75 @@ class MemoryAccessModel:
     def __init__(self):
         self.model = None
         self.explainer = None
+        self.cv_scores = {}
         os.makedirs("models", exist_ok=True)
         os.makedirs("rules", exist_ok=True)
         os.makedirs("plots", exist_ok=True)
+    
+    def compare_models(self):
+        print("\n===== STATISTICAL SIGNIFICANCE TESTING =====")
+
+        model_names = list(self.cv_scores.keys())
+
+        results = []
+
+        for i in range(len(model_names)):
+            for j in range(i+1, len(model_names)):
+
+                m1 = model_names[i]
+                m2 = model_names[j]
+
+                s1 = self.cv_scores[m1]
+                s2 = self.cv_scores[m2]
+
+                # Ensure same length
+                min_len = min(len(s1), len(s2))
+                s1, s2 = s1[:min_len], s2[:min_len]
+
+                # Paired t-test
+                t_stat, t_p = ttest_rel(s1, s2)
+
+                # Wilcoxon (safer)
+                try:
+                    w_stat, w_p = wilcoxon(s1, s2)
+                except:
+                    w_stat, w_p = None, None
+
+                results.append({
+                    "Model_1": m1,
+                    "Model_2": m2,
+                    "t_stat": t_stat,
+                    "t_p_value": t_p,
+                    "wilcoxon_stat": w_stat,
+                    "wilcoxon_p_value": w_p
+                })
+
+                print(f"\n{m1} vs {m2}")
+                print(f"t-test p-value: {t_p:.5f}")
+                print(f"wilcoxon p-value: {w_p}")
+
+        df = pd.DataFrame(results)
+        df.to_csv(f"rules/{benchmark}_statistical_tests.csv", index=False)
+    
+    def extract_cv_scores(self, grid, model_name):
+        results = grid.cv_results_
+        best_idx = grid.best_index_
+
+        split_keys = [k for k in results.keys() if "split" in k and "test_score" in k]
+
+        scores = [results[k][best_idx] for k in split_keys]
+
+        self.cv_scores[model_name] = scores
+        print(f"Extracted CV scores for {model_name}: {scores}")
+        print(f"Mean: {np.mean(scores):.4f}, Std: {np.std(scores):.4f}")
+        # Save to file
+        df = pd.DataFrame({
+            "fold": list(range(len(scores))),
+            "score": scores
+        })
+        df.to_csv(f"rules/{benchmark}_{model_name}_cv_scores.csv", index=False)
+
+        print(f"{model_name} CV Scores:", scores)
 
     def export_feature_importance(self, X, shap_values,model_name):
         feature_names = list(X.columns)
@@ -193,9 +259,9 @@ class MemoryAccessModel:
         X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
 
         param_grid = {"max_depth": [10,20,30], "min_samples_leaf": [1,5,10], "criterion": ["gini","entropy"]}
-        grid = GridSearchCV(DecisionTreeClassifier(), param_grid, cv=3, scoring="f1_macro", n_jobs=-1)
+        grid = GridSearchCV(DecisionTreeClassifier(), param_grid, cv=10, scoring="f1_macro", n_jobs=-1,verbose=0)
         grid.fit(X_train, y_train)
-
+        self.extract_cv_scores(grid,"decision_tree")
         self.model = grid.best_estimator_
         self.explainer = shap.TreeExplainer(self.model)
         
@@ -247,13 +313,14 @@ class MemoryAccessModel:
         grid = GridSearchCV(
             RandomForestClassifier(),
             param_grid,
-            cv=3,
+            cv=10,
             scoring="f1_macro",
-            n_jobs=-1
+            n_jobs=-1,
+            verbose=0
         )
 
         grid.fit(X_train, y_train)
-
+        self.extract_cv_scores(grid,"random_forest")
         self.model = grid.best_estimator_
         self.explainer = shap.TreeExplainer(self.model)
 
@@ -300,21 +367,21 @@ class MemoryAccessModel:
 
         param_grid = {
             "C": [0.1, 1, 10],
-            "kernel": ["rbf","polynomial","sigmoid"],
+            "kernel": ["rbf","polynomial"],
             "gamma": [0.01, 0.1, 1,0.3]
         }
 
         grid = GridSearchCV(
             SVC(probability=True),
             param_grid,
-            cv=2,
+            cv=10,
             scoring="f1_macro",
             n_jobs=-1,
-            verbose=2
+            verbose=0
         )
 
         grid.fit(X_train, y_train)
-
+        self.extract_cv_scores(grid,"svc")
         self.model = grid.best_estimator_
 
         # KernelExplainer for non-tree models
@@ -378,14 +445,14 @@ class MemoryAccessModel:
         grid = GridSearchCV(
             pipeline,
             param_grid,
-            cv=2,
+            cv=10,
             scoring="f1_macro",
             n_jobs=-1,
-            verbose=2
+            verbose=0
         )
 
         grid.fit(X_train, y_train)
-
+        self.extract_cv_scores(grid,"logistic_regression")
         self.model = grid.best_estimator_
 
         # SHAP KernelExplainer (non-tree model)
@@ -470,7 +537,24 @@ class MemoryAccessModel:
             probabilities = self.model.predict_proba(feature_df)
 
         unique, counts = np.unique(predictions, return_counts=True)
-        final_prediction = unique[np.argmax(counts)]
+        # final_prediction = unique[np.argmax(counts)]
+
+        # Compute percentages
+        total = len(predictions)
+        print("\nWindow-level consistency:")
+        print(f"Total windows: {total}")
+        print(f"Majority class windows: {counts[np.argmax(counts)]}")
+        percentages = {u: (c / total) * 100 for u, c in zip(unique, counts)}
+
+        # Sort by highest percentage
+        sorted_preds = sorted(percentages.items(), key=lambda x: x[1], reverse=True)
+
+        print("\n===== PREDICTION DISTRIBUTION =====")
+        for cls, pct in sorted_preds:
+            print(f"{custom_class_mapping[cls]:>20}: {pct:6.2f}%")
+
+        # Final prediction
+        final_prediction = sorted_preds[0][0]
         print("\n===== TRACE-LEVEL SUMMARY =====")
         print("Majority Class:", custom_class_mapping[final_prediction])
         print("\n===== DECISION TREE RULES =====")
