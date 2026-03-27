@@ -48,11 +48,11 @@ all models are statistically different.
 *** Cross dataset generalisation ***
 
 Model trained on     Custom     Stream    Rodinia   PolyBenchC    NPB 
-Custom                  -        0.26       0.00       0.125       0.2
-Stream                0.204        -        0.00       0.125       0.00
-Rodinia               0.08       0.26         -        0.125       0.4
-PolyBenchC            0.163      0.13       0.16          -        0.2
-NPB                   0.183      0.217      0.5        0.00          -
+Custom                0.843      0.26       0.00       0.125       0.2
+Stream                0.204      0.90       0.00       0.125       0.00
+Rodinia               0.08       0.26       0.999      0.125       0.4
+PolyBenchC            0.163      0.13       0.16       0.992       0.2
+NPB                   0.183      0.217      0.5        0.00        0.995
 
 interpretation: Low cross-dataset accuracy arises due to differences in memory behavior distributions across benchmark suites
 
